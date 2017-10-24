@@ -1,0 +1,23 @@
+
+.main {
+  overflow-y: hidden;
+}
+.big-btn {
+  display: box;
+  display: -webkit-box;
+  display: flex;
+  -webkit-box-pack: space-between;
+  -webkit-justify-content: space-between;
+  justify-content: space-between; 
+  margin: 60rpx 30rpx 0;
+}
+.new-btn {
+  width: 326rpx;
+  height: 80rpx;
+  border-radius: 4px;
+  background-color: #d0aa60;
+  font-size: 17px;
+  line-height: 80rpx; 
+  text-align: center;
+  color: #ffffff;
+}

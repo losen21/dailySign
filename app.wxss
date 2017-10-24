@@ -1,0 +1,151 @@
+/**app.wxss**/
+
+/**app.wxss**/
+ /* 引用toast的样式 */
+@import './pages/toast/toast.wxss'; 
+
+.main{
+    width: 100%;
+    height: 100%;
+    position: relative;
+    font-family: -apple-system, "SF Pro SC", "HanHei SC", "SF Pro Text", "Myriad Set Pro", "SF Pro Icons", "Apple Legacy Chevron", "PingFang SC", "Helvetica Neue", "Helvetica", "Arial", sans-serif;
+}
+page {
+  width:100%;
+  height:100%;
+}
+
+/*canvas开始  */
+#daily-canvas {
+  width: 100%;
+  height: 990rpx;
+}
+.daily-sign {
+  height: 920rpx;
+  margin: 32rpx 30rpx 0;
+  padding: 4rpx;
+  border: solid 6rpx #d0aa60;
+}
+.inside-content {
+  height: 99.6%;
+  border: solid 2rpx #d0aa60;
+  display: flex;
+  flex-wrap: wrap;
+}
+.date-section {
+  flex: 1; 
+  text-align: center;
+  border-right: 2rpx solid #d0aa60;
+}
+.icon {
+  width: 80rpx;
+  height: 80rpx;
+  margin: 50rpx auto 80rpx;
+  background: url('https://mobile.51wnl.com/temporary/dailysign/logo-iocn@2x.png') no-repeat center;
+  background-size: cover;
+}
+.new-date, .old-date {
+  font-size: 34rpx;
+  line-height: 1;
+  color: #333333;
+  margin-bottom: 20rpx;
+}
+.old-date {
+  margin-bottom: 40rpx;
+}
+.date-num {
+  font-size: 200rpx;
+  font-weight: 600;
+  line-height: 0.8;
+  color: #333333;
+  margin-bottom: 60rpx;
+  font-family: SFProDisplay;
+}
+.festival-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  margin: 0 20rpx;
+}
+.line {
+  width: 50rpx;
+  height: 3rpx;
+  background-color: #333333;
+}
+.festival {
+  font-size: 34rpx;
+  line-height: 1;
+  color: #333333;
+  margin: 0 21rpx;
+  /* text-align: left; */
+}
+.detali-section {
+  display: flex;
+  padding: 100rpx 50rpx;
+}
+.tiangan {
+  width: 34rpx;
+  padding: 64rpx 11.5rpx;
+  border-radius: 30rpx;
+  border: solid 2rpx #d0aa60;
+  text-align: center;
+  margin-right: 34rpx;
+  font-size: 30rpx;
+  line-height: 1.13;
+  color: #d0aa60;
+}
+.yiji {
+  width: 56rpx;
+}
+.yi, .ji {
+  margin-bottom: 18rpx;
+  font-size: 34rpx;
+  color: #ffffff;
+  width: 56rpx;
+  height: 56rpx;
+  background-color: #d0aa60;
+  border-radius: 50%;
+  text-align: center;
+  line-height: 56rpx;
+}
+.ji {
+  margin-top: 84rpx;
+}
+.title {
+  font-size: 34rpx;
+  line-height: 1.12;
+  color: #333333;
+  text-align: center;
+}
+.desc-section {
+  width: 100%;
+  padding: 0 40rpx 0;
+  border-top: 2rpx solid #d0aa60;
+  font-size: 30rpx;
+  line-height: 1.33;
+  text-align: left;
+  color: #333333;
+  padding-top: 20rpx;
+}
+.sign-times {
+  /* margin-top: 20rpx; */
+  margin-left: -10rpx;
+  color: #c30d23;
+  font-size: 30rpx;
+}
+.desc {
+  margin-top: 10rpx;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+  overflow: hidden;
+}
+/*canvas结束  */
+
+@media (-webkit-min-device-pixel-ratio: 3),(min-device-pixel-ratio: 3){
+  .icon {
+    background: url('https://mobile.51wnl.com/temporary/dailysign/logo-iocn@3x.png') no-repeat center;
+    background-size: cover;
+  }
+}

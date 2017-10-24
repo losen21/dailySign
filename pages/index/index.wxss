@@ -1,0 +1,200 @@
+/**index.wxss**/
+.index {
+  /* width: 100%; */
+  /* height: 100%; */
+  /* position: absolute; */
+}
+/*canvas开始  */
+swiper {
+  height: 990rpx;
+}
+
+
+/*签到模块sign-content 开始  */
+.sign-content {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+.sign-content .tip {
+  height: 60rpx;
+  font-size: 13px;
+  line-height: 60rpx;
+  color: #333333;
+  padding: 0 60rpx 0 30rpx; 
+  border-radius: 29rpx;
+  background-color: #f8f8f8;
+  border: solid 1px #dedede;
+  margin-right: -40rpx;
+}
+.sign-content .sign {
+  z-index: 1;
+  width: 170rpx; 
+  height: 80rpx;
+  line-height: 80rpx;
+  font-size: 34rpx;
+  text-align: center; 
+  color: #ffffff;
+  border-radius: 40rpx;
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  background: linear-gradient(115deg, #ffbe45, #d8923a);
+  box-shadow: 0 2px 4px 0 rgba(188, 188, 188, 0.5);
+}
+/*签到模块sign-content 结束  */
+
+/*切换模块switch-content 开始  */
+.switch-content {
+  display: flex;
+  align-items: center;
+  width: 240rpx;
+  margin: 20rpx auto 0; 
+}
+.back-today {
+  margin-top: 100rpx;
+}
+.switch-icon {
+  width: 50rpx;
+  height: 50rpx;
+  background: url('https://mobile.51wnl.com/temporary/dailysign/change-icon@2x.png') no-repeat center;
+  background-size: cover;
+}
+.today-icon {
+  width: 50rpx;
+  height: 50rpx;
+  background: url('https://mobile.51wnl.com/temporary/dailysign/today-icon@2x.png') no-repeat center;
+  background-size: cover;
+}
+.switch-tip {
+  font-size: 15px;
+  line-height: 1;
+  color: #c30d23;
+  margin-left: 20rpx;
+}
+/*切换模块switch-content 结束  */
+
+
+/*pop mask  */
+.mask {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0.5;
+  background-color: #000000;
+  z-index: 2;
+  /* display: none; */
+}
+.pop {
+  position: absolute;
+  top: 464rpx;
+  left: 96rpx;
+  width: 560rpx;
+  /* height: 314rpx; */
+  border-radius: 4px;
+  background-color: #ffffff;
+  z-index: 3;
+}
+.pop-title {
+  font-size: 17px;
+  line-height: 1;
+  text-align: center;
+  color: #333333;
+  margin: 40rpx 0 28rpx;
+}
+.pop-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  padding-bottom: 40rpx;
+  border-bottom: 2rpx solid #e5e5e5
+}
+.pop-line {
+  width: 50rpx;
+  height: 3rpx;
+  background-color: #d0aa60;
+}
+.pop-day {
+  font-family: SFProDisplay;
+  font-size: 72rpx;
+  font-weight: 600;
+  line-height: 1;
+  text-align: center;
+  color: #d0aa60;
+  margin: 0 40rpx;
+  /* text-align: left; */
+}
+
+.pop-btn{
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100rpx;
+}
+.btn {
+  flex: 1;
+  text-align: center;
+  height: 100%;
+  line-height: 100rpx;
+  font-size: 17px;
+}
+.left-btn {
+  border-right: 2rpx solid #e5e5e5;
+  color: #333333;
+}
+.right-btn {
+  color: #d0aa60;
+}
+.close-content {
+  position: absolute;
+  top: 15rpx;
+  right: 15rpx;
+  padding: 15rpx;
+}
+.close-icon {
+  width: 20rpx;
+  height: 20rpx;
+  /* margin: 50rpx auto 80rpx; */
+  background: url('https://mobile.51wnl.com/temporary/dailysign/close-icon@2x.png') no-repeat center;
+  background-size: cover;
+}
+.big-btn {
+  margin: 60rpx 30rpx 0;
+  -webkit-box-pack: space-between;
+  -webkit-justify-content: space-between;
+  justify-content: space-between; 
+}
+.new-btn {
+  width: 326rpx;
+  height: 80rpx;
+  border-radius: 4px;
+  background-color: #d0aa60;
+  font-size: 17px;
+  line-height: 80rpx; 
+  text-align: center;
+  color: #ffffff;
+}
+
+/* iphone5 */
+@media screen and (min-width: 310px) and (max-width: 359px) {
+  .desc {
+    margin-top: 20rpx;
+  }
+}
+
+@media (-webkit-min-device-pixel-ratio: 3),(min-device-pixel-ratio: 3){
+  .close-icon {
+    background: url('https://mobile.51wnl.com/temporary/dailysign/close-icon@3x.png') no-repeat center;
+    background-size: cover;
+  }
+  .switch-icon {
+    background: url('https://mobile.51wnl.com/temporary/dailysign/change-icon@3x.png') no-repeat center;
+    background-size: cover;
+  }
+  .today-icon {
+    background: url('https://mobile.51wnl.com/temporary/dailysign/today-icon@3x.png') no-repeat center;
+    background-size: cover;
+  }
+}

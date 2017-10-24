@@ -1,0 +1,8 @@
+<!-- wetoast.wxml -->
+<template name="toast">
+    <view class="toast-content-box" wx:if="{{isHide}}">
+        <view class='toast-content'>
+          <view class='toast-text'>{{content}}</view>
+        </view>
+    </view>
+</template>
