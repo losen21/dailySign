@@ -52,13 +52,6 @@ Page({
       wx.setStorageSync('firstTime', firstTime)
       console.log(wx.getStorageSync('uid'))
     }
-    // // 每天晚上十二点清除前一天签到数据
-    // if (1) {
-    //   let d = new Date();
-    //   if (d.getHours() === 0 && d.getMinutes() === 0) {
-    //     wx.setStorageSync('signed',false)
-    //   }
-    // }
     // 如果有本地数据
     if (HistoryData) {
       let data = HistoryData.HistoryData;
