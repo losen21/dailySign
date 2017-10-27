@@ -1,1 +1,17 @@
 /* pages/changestyle/changestyle.wxss */
+.bottom-group {
+  margin: 25rpx 215rpx 0;
+  display: flex;
+  justify-content: space-between;
+  /* width: 500rpx; */
+  /* background: linear-gradient(115deg, #ffbe45, #d8923a);  */
+}
+.img {
+  width: 140rpx;
+  height: 160rpx;
+  /* margin-right: 40rpx; */
+}
+image {
+  width: 100%;
+  height: 100%;
+}

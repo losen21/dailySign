@@ -1,14 +1,10 @@
 
 .main {
-  overflow-y: hidden;
+  /* overflow-y: hidden; */
 }
 .big-btn {
-  display: box;
-  display: -webkit-box;
   display: flex;
-  -webkit-box-pack: space-between;
-  -webkit-justify-content: space-between;
-  justify-content: space-between; 
+  justify-content: space-around; 
   margin: 60rpx 30rpx 0;
 }
 .new-btn {

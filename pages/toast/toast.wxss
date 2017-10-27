@@ -5,15 +5,15 @@
   /* justify-content: center; */
   /* align-items: center;  */
   position: fixed;
-  bottom: 200rpx;
+  bottom: 140rpx;
   left: 50%;
-  margin-left: -110rpx; 
+  margin-left: -120rpx; 
   z-index: 999;
   
 }
 .toast-content {
-  width: 220rpx;
-  padding: 15rpx 20rpx; 
+  width: 240rpx;
+  padding: 20rpx 30rpx; 
   background: rgba(17,17,17,0.7);
   border-radius: 10rpx;
 }

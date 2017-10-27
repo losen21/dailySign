@@ -1,13 +1,14 @@
 <!--logs.wxml-->
 
 <view class='main'>
-  <view class='daily-sign style1'>
+  <view class='daily-sign style1' wx:if='{{style0}}'>
     <view class='inside-content'>
       <view class='date-section'>
-        <view class='icon'></view>
         <view class='new-date'>{{item.year}}年{{item.month}}月</view>
         <view class='old-date'>农历{{item.chiMonth}}{{item.chiDay}}</view>
-        <view class='date-num'>{{item.day}}</view>
+        <view class='date-num-content'> 
+          <view class='date-num'>{{item.day}}</view>                    
+        </view> 
         <view class='festival-content' wx:if="{{item.festival}}"> 
           <view class='line'></view> 
           <view class='festival'>{{item.festival}}</view>
@@ -15,6 +16,7 @@
         </view>
       </view>
       <view class='detali-section'>
+        <view class='icon'></view>
         <view class='tiangan'>
           <text>{{item.gYear}}</text>
           <text>·</text>
@@ -23,25 +25,109 @@
           <text>{{item.gDay}}</text>
         </view>
         <view class='yiji'>
-          <view class='yi'>宜</view>
-          <view class='title'>{{item.yi}}</view>
-          <view class='ji'>忌</view>
-          <view class='title'>{{item.ji}}</view>
+          <!-- <view wx:if='{{item.yi}}'> -->
+            <view class='yi'>宜</view>
+            <view class='title'>{{item.yi}}</view>
+          <!-- </view> -->
+          <!-- <view wx:if='{{item.ji}}'> -->
+            <view class='ji'>忌</view>
+            <view class='title'>{{item.ji}}</view>
+          <!-- </view>  -->
         </view>
       </view>
       <view class='desc-section'>
-        <view class='sign-times' wx:if="{{item.rIndex }}">
+        <view class='sign-times' wx:if="{{item.rIndex}}">
           <text>【第</text>
           <text>{{item.largerIndex}}</text>
           <text>天】</text>
         </view>
-        <view class='desc'>{{item.dayText}}</view>
+        <view class='sign-times' wx:else></view>
+        <view class='middle'>
+          <view class='desc'>{{item.dayText}}</view>
+        </view>
       </view>
     </view>
   </view>
-  <view class='big-btn'>
-    <view class='new-btn' bindtap='saveSign'>保存日签</view>
-    <view class='new-btn' bindtap='shareNow'>分享</view>
+  <view class='daily-sign style2' wx:if='{{style1}}'>
+    <view class='inside-content'>
+      <view class='date-section'>
+        <view class='icon'></view>
+        <view class='date-section-content'>
+          <view class='date-num-content'>
+            <view class='new-date'>{{item.month}}.{{item.day}}</view>
+            <view class='weekday'>{{item.weekText}}</view>
+          </view> 
+          <view class='date-detail-content'>
+            <view class='left-content temp-content'>{{item.chiMonth}}{{item.chiDay}}</view>
+            <view class='right-content temp-content'>{{item.gYear}}属{{item.animalYear}}</view>
+          </view> 
+        </view>
+        <view class='festival' wx:if="{{item.festival}}">{{item.festival}}</view>
+      </view>
+      <view class='detali-section'>
+        <image src='{{item.largeImage}}'></image>
+      </view>
+      <view class='desc-section'>
+        <view class='sign-times' wx:if="{{item.rIndex}}">
+          <text>【第</text>
+          <text>{{item.largerIndex}}</text>
+          <text>天】</text>
+        </view>
+        <view class='sign-times' wx:else></view>
+        <view class='middle'>
+          <view class='desc'>{{item.dayText}}</view>
+        </view>
+      </view>
+    </view>
   </view>
+  <view class='daily-sign style3' wx:if='{{style2}}'>
+    <view class='inside-content'>
+      <view class='detali-section'>
+        <view class='icon'></view>
+        <view class='tiangan-content'>
+          <view class='tiangan'>
+            <text>{{item.gYear}}</text>
+            <text>·</text>
+            <text>{{item.gMonth}}</text>
+            <text>·</text>
+            <text>{{item.gDay}}</text>
+          </view>
+          <view class='yiji'>
+            <view class='yi'>宜</view>
+            <view class='title'>{{item.yi}}会亲友</view>
+            <view class='ji'>忌</view>
+            <view class='title'>{{item.ji}}会亲友</view>
+          </view>
+        </view>
+      </view>
+      <view class='desc-section'>
+        <view class='sign-times' wx:if="{{item.rIndex }}">
+          <text>第</text>
+          <text>{{item.largerIndex}}</text>
+          <text>天</text>
+        </view>
+        <view class='desc'>
+          <view class='inside-txt'>{{item.dayText}}</view>
+        </view>
+      </view>
+      <view class='date-section'>
+        <view class='new-date'>{{item.largeYear}}年{{item.largeMonth}}月{{item.largeDay}}日</view>
+        <view>
+          <view class='old-date'>农历{{item.chiMonth}}{{item.chiDay}}
+            <view class='festival' wx:if="{{item.festival}}">{{item.festival}}</view>
+          </view>              
+        </view>
+      </view>    
+    </view>
+  </view>
+  <view class='big-btn'>
+    <button class='new-btn' bindtap='saveSign'>保存日签</button>
+    <button class='new-btn' bindtap='shareNow' open-type="share">分享</button>
+  </view>
+</view>
+<view class='canvas-group'>
+  <canvas canvas-id='style0' wx:if='{{style0}}'></canvas>
+  <canvas canvas-id='style1' wx:if='{{style1}}'></canvas>
+  <canvas canvas-id='style2' wx:if='{{style2}}'></canvas>
 </view>
 

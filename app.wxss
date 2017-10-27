@@ -13,59 +13,107 @@
 page {
   width:100%;
   height:100%;
+  background-color: #efeff4;
+}
+/*canvas开始  */
+.canvas-group {
+  margin:32rpx 30rpx;
+  display: none;
+}
+swiper {
+  height: 974rpx;
+}
+canvas {
+  width: 100%;
+  height:920rpx;
+  background-color:#ffffff;
+  box-shadow:0 0 8px 0 rgba(0, 0, 0, 0.1);
+}
+.test-canvas {
+  width: 500rpx;
+  height: 80rpx;
 }
 
-/*canvas开始  */
 #daily-canvas {
   width: 100%;
-  height: 990rpx;
+  height: 980rpx;
 }
 .daily-sign {
   height: 920rpx;
   margin: 32rpx 30rpx 0;
-  padding: 4rpx;
-  border: solid 6rpx #d0aa60;
+  position: relative;
+  
 }
 .inside-content {
-  height: 99.6%;
-  border: solid 2rpx #d0aa60;
+  height: 100%;
   display: flex;
   flex-wrap: wrap;
+  background-color: #ffffff;
+  box-shadow: 0 0 8px 0 rgba(0, 0, 0, 0.1);
 }
 .date-section {
   flex: 1; 
   text-align: center;
-  border-right: 2rpx solid #d0aa60;
+  border-right: 2rpx solid #e0e0e0;
+  position: relative;
+  margin: 40rpx 0; 
+  height: 606rpx;
 }
 .icon {
-  width: 80rpx;
-  height: 80rpx;
-  margin: 50rpx auto 80rpx;
-  background: url('https://mobile.51wnl.com/temporary/dailysign/logo-iocn@2x.png') no-repeat center;
+  position: absolute;
+  top: 80rpx;
+  width: 50rpx;
+  height: 79rpx;
+  margin-left: -5rpx;
+  background: url('https://mobile.51wnl.com/temporary/dailysign/logo-icon@2x.png') no-repeat center;
   background-size: cover;
 }
 .new-date, .old-date {
   font-size: 34rpx;
   line-height: 1;
   color: #333333;
-  margin-bottom: 20rpx;
+  margin: 112rpx auto 20rpx;
 }
 .old-date {
-  margin-bottom: 40rpx;
+  margin:20rpx auto 40rpx;
+}
+.date-num-content {
+  /* display: flex;
+  justify-content: space-around;
+  align-items: center; */
+  margin-bottom: 60rpx;
+  position: relative;
 }
 .date-num {
   font-size: 200rpx;
   font-weight: 600;
   line-height: 0.8;
   color: #333333;
-  margin-bottom: 60rpx;
   font-family: SFProDisplay;
+  display: inline-block;
+}
+.slide-icon {
+  width: 60rpx;
+  height: 120rpx;
+  display: inline-block;
+  position: absolute;
+  top: 374rpx;
+  z-index: 2;
+}
+.slide-icon.left-icon {
+  left: 0;
+  background: url('https://mobile.51wnl.com/temporary/dailysign/left-icon@2x.png') no-repeat center;
+  background-size: cover;
+}
+.slide-icon.right-icon {
+  right: 0;
+  background: url('https://mobile.51wnl.com/temporary/dailysign/right-icon@2x.png') no-repeat center;
+  background-size: cover;
 }
 .festival-content {
   display: flex;
   align-items: center;
   justify-content: center;
-
   margin: 0 20rpx;
 }
 .line {
@@ -82,70 +130,302 @@ page {
 }
 .detali-section {
   display: flex;
-  padding: 100rpx 50rpx;
+   /* padding: 154rpx 50rpx 0;  */
+  height: 515rpx;
+  padding: 114rpx 50rpx 0; 
+  position: relative;
+  margin-top: 20rpx; 
+  overflow: hidden;
 }
 .tiangan {
   width: 34rpx;
-  padding: 64rpx 11.5rpx;
-  border-radius: 30rpx;
-  border: solid 2rpx #d0aa60;
+  /* padding: 64rpx 11.5rpx 0; */
   text-align: center;
-  margin-right: 34rpx;
+  margin-right: 50rpx;
+  margin-top: 108rpx;
   font-size: 30rpx;
   line-height: 1.13;
-  color: #d0aa60;
+  color: #999999;
 }
 .yiji {
-  width: 56rpx;
+  /* width: 56rpx; */
+  margin-top: 20rpx;
 }
 .yi, .ji {
   margin-bottom: 18rpx;
-  font-size: 34rpx;
-  color: #ffffff;
+  font-size: 30rpx;
+  color: #333333;
   width: 56rpx;
-  height: 56rpx;
-  background-color: #d0aa60;
-  border-radius: 50%;
+  /* height: 56rpx; */
+  /* background-color: #d0aa60;
+  border-radius: 50%; */
   text-align: center;
-  line-height: 56rpx;
+  line-height: 1; 
 }
 .ji {
-  margin-top: 84rpx;
+  margin-top: 40rpx;
 }
 .title {
-  font-size: 34rpx;
-  line-height: 1.12;
-  color: #333333;
+  font-size: 30rpx;
+  line-height: 1;
+  color: #999999;
   text-align: center;
+  width: 56rpx;
 }
 .desc-section {
-  width: 100%;
-  padding: 0 40rpx 0;
-  border-top: 2rpx solid #d0aa60;
+  width: 88.4%; 
+  height: 229rpx;
+  border-top: 2rpx solid #e0e0e0;
   font-size: 30rpx;
   line-height: 1.33;
   text-align: left;
   color: #333333;
+  background-color: #ffffff;
   padding-top: 20rpx;
+  margin:  -20rpx auto 0;
+  display: table;
+  overflow:hidden;
+  position: relative;
 }
+.middle {
+  display:table-cell; 
+  vertical-align:middle;
+  /* padding: 0 40rpx 0; */
+} 
 .sign-times {
-  /* margin-top: 20rpx; */
-  margin-left: -10rpx;
+  position: absolute;
+  top: 20rpx;
+  margin-left: -15rpx; 
   color: #c30d23;
   font-size: 30rpx;
+  line-height: 1;
+  height: 30rpx;
 }
 .desc {
-  margin-top: 10rpx;
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 4;
   overflow: hidden;
 }
+.style1 .festival-content .festival{
+  /* color: #d0aa60; */
+}
+.style1 .festival-content .line {
+  /* background-color: #d0aa60; */
+}
 /*canvas结束  */
+
+/*样式二开始  */
+.style2 .detali-section{
+  padding: 30rpx;
+  padding-left: 0;
+  width: 340rpx;
+  height: 606rpx;
+  margin-top: 0;
+}
+.style2 .detali-section image{
+  width: 100%;
+  height: 100%;
+}
+.style2 .date-section {
+  border: none;
+}
+.style2 .icon {
+  top: 536rpx;
+  left: 50%;
+  margin-left: -25rpx;
+}
+.style2 .date-detail-content {
+  display: flex;
+   /* justify-content: center; */
+  align-items: center; 
+}
+.style2 .date-section-content {
+  width: 164rpx;
+  margin: 0 auto;
+  border: solid 1px #e0e0e0;
+}
+.style2 .temp-content {
+  width: 34rpx;
+}
+.style2 .left-content {
+  padding:16rpx 30rpx 18rpx 28rpx;
+  border-right: solid 1px #e0e0e0;
+  font-size: 15px;
+  line-height: 1.13;
+  color: #333333;
+}
+.style2 .right-content {
+  padding: 14rpx 20rpx 14rpx 18rpx;
+  
+  font-size: 12px;
+  line-height: 1.17;
+  text-align: center;
+  color: #333333;
+}
+.style2 .desc-section {
+  height: 200rpx;
+}
+.style2 .new-date {
+  font-family: SFProDisplay;
+  font-size: 24rpx;
+  color: #333333;
+  margin: 0;
+  display: inline-block;
+}
+.style2 .weekday {
+  font-size: 24rpx;
+  color: #333333;
+  margin-bottom: 0;
+  line-height: 1;
+}
+.style2 .date-detail-content {
+  font-size: 34rpx;
+  color: #333333;
+  line-height: 1;
+}
+.style2 .date-num-content {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  padding: 18rpx 0 14rpx;
+  margin: 0;
+  border-bottom: solid 1px #e0e0e0;
+}
+.style2 .slide-icon {
+  top: 10rpx;
+}
+.style2 .right-icon {
+  right: 20rpx;
+}
+.style2 .left-icon {
+  left: 20rpx;
+}
+.style2 .festival {
+  /* width: 34rpx; */
+  font-size: 24rpx;
+  line-height: 1;
+  color: #333333;
+  margin: 0;
+  width:164rpx;
+  margin:0 auto;
+  border:solid 1px #e0e0e0;
+  border-top: none;
+  padding: 14rpx 0;
+  text-align: center;
+}
+/*样式二结束  */
+
+/*样式三开始  */
+.style3 .inside-content {
+  flex-wrap: nowrap;
+  flex-flow: row;
+}
+.style3 .detali-section{
+  width: 200rpx;
+  display: block;
+  padding: 30rpx 40rpx 0;
+  flex: 1;
+  border-right:2rpx solid #d0aa60;
+
+}
+.style3 .desc-section {
+  display: block;
+  width: 270rpx;
+  height: auto; 
+  border-top: none;
+  border-right:2rpx solid #d0aa60;
+  position: relative;
+  /* padding-top: 260rpx; */
+}
+.style3 .date-section {
+  border-right: none;
+  display: flex;
+  flex-direction: row-reverse;
+  justify-content: center;
+  padding: 0 50rpx;
+}
+.style3 .tiangan-content {
+  display: flex;
+}
+.style3 .tiangan {
+  border: none;
+  padding: 0;
+  padding-top: 20rpx;
+}
+.style3 .icon {
+  margin: 0 auto 150rpx;
+}
+.style3 .new-date, .style3 .old-date {
+  width: 34rpx;
+}
+.style3 .new-date {
+  margin-top: 160rpx;
+}
+.style3 .old-date {
+  margin: 328rpx 30rpx 40rpx 0;
+}
+.style3 .sign-times {
+  width: 26rpx;
+  position: absolute;
+  top: 30rpx;
+  right: 18rpx;
+}
+.style3 .desc {
+  /* width: 152rpx; */
+  display: block;
+  /* margin-top: 250rpx; */
+  position: absolute;
+  top: 250rpx;
+  right: 50rpx;
+  /* height: 400rpx; */
+  writing-mode: tb-rl;
+  -webkit-writing-mode: vertical-rl;      
+  writing-mode: vertical-rl;
+}
+.style3 .inside-txt {
+  width: 142rpx;
+  height: 400rpx;
+  overflow: hidden;
+  -webkit-writing-mode: vertical-rl;
+  writing-mode: vertical-rl;
+  line-height: 1.7;
+  font-size: 30rpx;
+  letter-spacing: 10rpx;
+  -webkit-line-clamp: 3;
+}
+.style3 .festival {
+  /* width: 34rpx; */
+  font-size: 34rpx;
+  line-height: 1;
+  color: #d0aa60;
+  /* text-align: center; */
+  margin: 40rpx 0 0 0;
+}
+.style3 .slide-icon {
+  top: 900rpx;
+}
+.style3 .left-icon {
+  left: 60rpx;
+}
+.style3 .right-icon {
+  right: 60rpx;
+}
+/*样式三结束  */
+
+
 
 @media (-webkit-min-device-pixel-ratio: 3),(min-device-pixel-ratio: 3){
   .icon {
-    background: url('https://mobile.51wnl.com/temporary/dailysign/logo-iocn@3x.png') no-repeat center;
+    background: url('https://mobile.51wnl.com/temporary/dailysign/logo-icon@3x.png') no-repeat center;
+    background-size: cover;
+  }
+  .left-icon {
+    background: url('https://mobile.51wnl.com/temporary/dailysign/left-icon@3x.png') no-repeat center;
+    background-size: cover;
+  }
+  .right-icon {
+    background: url('https://mobile.51wnl.com/temporary/dailysign/right-icon@3x.png') no-repeat center;
     background-size: cover;
   }
 }
