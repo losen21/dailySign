@@ -277,6 +277,7 @@ Page({
   },
   // 在弹窗中保存图片
   saveSign:function(e){
+    console.log('=================')
     let canvasId = ''
     if (this.data.style0) {
       canvasId = 'style0'
