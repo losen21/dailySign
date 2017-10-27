@@ -139,6 +139,10 @@ button {
   border-radius: 8rpx;
   position: static;
 }
+button::after {
+  width: 0;
+  height: 0;
+}
 .button-hover {
   background-color: #fff;
 }

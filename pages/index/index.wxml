@@ -154,10 +154,10 @@
       <view class='pop-day'>{{signdays}}天</view>
       <view class='pop-line'></view>
     </view>
-    <view class='pop-btn'>
+    <view class='pop-btn'> 
       <button class='btn left-btn' bindtap='saveSign'>保存日签</button>
       <button class='btn right-btn' open-type='share'>立马分享</button> 
-    </view>
+    </view> 
     <view class='close-content' bindtap='closePop'>
       <view class='close-icon'></view>
     </view>
