@@ -310,3 +310,4 @@ let data = {
   "serverInstance": "Local"
 }
 module.exports.HistoryData = data.data
+module.exports.data = data.data
