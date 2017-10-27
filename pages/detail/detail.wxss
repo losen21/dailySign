@@ -1,6 +1,6 @@
 
 .main {
-  /* overflow-y: hidden; */
+   overflow-y: hidden; 
 }
 .big-btn {
   display: flex;

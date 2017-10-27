@@ -14,8 +14,7 @@ Page({
     signtxt: '签到',
     tiptxt: '你还没开始签到哦',
     signed: false,
-    signdays: 0,
-    // showDays: false,
+    signdays: '',
     todayIndex: 0,   //当天的已签到天数
     history: [],
     autoplay: false,
@@ -103,11 +102,6 @@ Page({
         success: function (res) {
           console.log(res.data)
           if (res.data.status === 200) {
-            // 签到成功后 设置当天的数据为之前签到天数+1
-            // let userData = that.data.history
-            // userData[userData.length - 1].rIndex = that.data.todayIndex + 1
-            // userData[userData.length - 1].largerIndex = that.NumberToChinese(that.data.todayIndex + 1)
-
             // 签到成功后重新请求列表
             that.getDailyInfo()
             let userData = that.data.history
@@ -161,8 +155,6 @@ Page({
       for (var i = 0; i < a[1].length; i++) re += AA[a[1].charAt(i)];
     }
     return re;
-    // let chi = ["〇", "一", "二", "三", "四", "五", "六", "七", "八", "九"]
-    // let int = ['0','1','2','3','4','5','6','7','8','9']
   },
   yearToChinese:function(num){
     let chi = ["〇", "一", "二", "三", "四", "五", "六", "七", "八", "九"]
@@ -270,7 +262,6 @@ Page({
   },
   // 在弹窗中保存图片
   saveSign:function(e){
-    console.log('=================')
     let canvasId = ''
     if (this.data.style0) {
       canvasId = 'style0'
@@ -519,6 +510,7 @@ Page({
     }
   },
   onShareAppMessage: function (res) {
+    let that = this
     if (res.from === 'button') {
       // 来自页面内转发按钮
       console.log(res.target)
@@ -530,9 +522,14 @@ Page({
       imgUrl: 'https://mobile.51wnl.com/temporary/dailysign/style3-choose-icon@2x.png',
       success: function (res) {
         // 转发成功
+        that.setData({
+          showPop: false
+        })
+        that.show('分享成功')
       },
       fail: function (res) {
         // 转发失败
+        that.show('分享失败')
       }
     }
   }
