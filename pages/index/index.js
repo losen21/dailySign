@@ -299,6 +299,9 @@ Page({
     // 将canvas生成白色背景，避免生成的png图片背景是透明的
     ctx.setFillStyle('#ffffff')
     ctx.fillRect(0, 0, prop * 690, prop * 920)
+    // 二维码
+    let qrcode = '../images/qrcode.jpg'
+    ctx.drawImage(qrcode, prop * 180, prop * 546, prop * 100, prop * 100);
     // 日期板块
     ctx.setFillStyle('#333333')
     ctx.setFontSize(prop * 34)
@@ -306,14 +309,14 @@ Page({
     ctx.fillText('农历' + data.chiMonth + data.chiDay, prop * 130, prop * 210)
     ctx.setFontSize(prop*200)
     ctx.fillText(data.day, prop * 115, prop * 420)
-    // 节日左边线条
-    ctx.beginPath()
-    ctx.lineWidth = prop * 2;
-    ctx.moveTo(prop * 118, prop * 516)
-    ctx.lineTo(prop * 168, prop * 516)
-    ctx.setStrokeStyle('#333333')
-    ctx.stroke()
     if (data.festival) {
+      // 节日左边线条
+      ctx.beginPath()
+      ctx.lineWidth = prop * 2;
+      ctx.moveTo(prop * 118, prop * 516)
+      ctx.lineTo(prop * 168, prop * 516)
+      ctx.setStrokeStyle('#333333')
+      ctx.stroke()
       // 节日
       ctx.setFontSize(prop * 34)
       ctx.setFillStyle('#333333')
@@ -411,7 +414,10 @@ Page({
     }
     // icon
     let icon = '../images/logo-icon@3x.png'
-    ctx.drawImage(icon, prop * 132, prop * 576, prop * 50, prop * 79);
+    ctx.drawImage(icon, prop * 132, prop * 436, prop * 50, prop * 79);
+    // 二维码
+    let qrcode = '../images/qrcode.jpg'
+    ctx.drawImage(qrcode, prop * 106, prop * 546, prop * 100, prop * 100);
     // 每日图片,先下载到本地，再绘图
     let image,that = this
     wx.downloadFile({

@@ -128,8 +128,8 @@
   </view>
 </view>
 <view class='canvas-group'>
-  <canvas canvas-id='style0' wx:if='{{style0}}'></canvas>
-  <canvas canvas-id='style1' wx:if='{{style1}}'></canvas>
-  <canvas canvas-id='style2' wx:if='{{style2}}'></canvas>
+  <canvas canvas-id='style0'></canvas>
+  <canvas canvas-id='style1'></canvas>
+  <!-- <canvas canvas-id='style2'></canvas> -->
 </view>
 
