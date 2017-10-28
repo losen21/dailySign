@@ -22,15 +22,14 @@ Page({
     current: 0,
     showPop: false,
     isToday: true,
-    rightContent: '明天，敬请期待~',
-    leftContent: '只能到这里咯！',
     lastX: 0,
     lastY: 0,
     lastSlide: true,
     firstSlide: false,
     style0: true,
     style1: false,
-    style2: false
+    style2: false,
+    currentStyle: 0
   },
   onLoad: function (e) {
     let app = getApp()
@@ -171,7 +170,11 @@ Page({
   getDailyInfo: function(date){
     let datekey = wx.getStorageSync('firstTime')
     let enddatekey = util.formatTime(new Date()).split(' ')[0]
-
+    // 计算首次使用日期和当前日期差值，最多显示一个月的数据
+    let diff = this.getDateDiff(datekey, enddatekey)
+    console.log(diff)
+    datekey = diff > 31 ? 31 : datekey
+    
     // 在第二天进行操作时
     if (wx.getStorageSync('useDate')) {
       // 同一天内使用
@@ -227,9 +230,9 @@ Page({
           if (data[i].largeDay === '一十') {
             data[i].largeDay = '十'
           }
-          // data[i].weekText = data[i].weekText.replace('周','星期')
           if (data[i].festival) {
-            data[i].festival = data[i].festival.substring(0,2)
+            // data[i].festival = data[i].festival.substring(0,2)
+            data[i].festival = data[i].festival.replace('节', '')
           }
 
           if(data[i].rIndex !== 0) {
@@ -255,33 +258,49 @@ Page({
       }
     })
   },
-  
-  // 在弹窗中分享
-  shareNow: function() {
-    
+  getDateDiff: function (startDate, endDate){
+    var startTime = new Date(Date.parse(startDate.replace(/-/g, "/"))).getTime();
+    var endTime = new Date(Date.parse(endDate.replace(/-/g, "/"))).getTime();
+    var dates = Math.abs((startTime - endTime)) / (1000 * 60 * 60 * 24);
+    return dates;
   },
-  // 在弹窗中保存图片
-  saveSign:function(e){
+  
+  // 保存图片
+  saveSign:function(){
     let canvasId = ''
+    let that = this
     if (this.data.style0) {
       canvasId = 'style0'
       this.drawStyle0()
+      setTimeout(function(){
+        that.saveImage('style0')
+      }, 1500)
     }
     if (this.data.style1) {
       canvasId = 'style1'
       this.drawStyle1()
-
+      // 防止图片还未绘制完成就保存 ps 官方drawImage方法还未加入绘制完成回调，用延时处理
+      setTimeout(function(){
+        that.saveImage('style1')
+      }, 1500)
     }
     if (this.data.style2) {
       canvasId = 'style2'
       this.drawStyle2()
     }
+    // this.drawStyle0()
+    // this.drawStyle1()
   },
   drawStyle0:function(){
+    let that = this
     // 只需要当天的数据
     let data = this.data.history[this.data.history.length-1]
     const ctx = wx.createCanvasContext('style0')
+    // 将canvas生成白色背景，避免生成的png图片背景是透明的
+    ctx.setFillStyle('#ffffff')
+    ctx.fillRect(0, 0, prop * 690, prop * 920)
     // 日期板块
+    ctx.setFillStyle('#333333')
     ctx.setFontSize(prop * 34)
     ctx.fillText(data.year + '年' + data.month + '月', prop * 140, prop * 152)
     ctx.fillText('农历' + data.chiMonth + data.chiDay, prop * 130, prop * 210)
@@ -314,7 +333,6 @@ Page({
       ctx.stroke()
     }
     // icon
-    let that = this
     let icon = '../images/logo-icon@3x.png'
     ctx.drawImage(icon, prop * 500, prop * 70, prop * 50, prop * 79);
     
@@ -336,36 +354,108 @@ Page({
     this.verticalTxt(ctx, yistr, prop * 600, prop * 210)   
     let jistr = data.ji
     this.verticalTxt(ctx, jistr, prop * 600, prop * 480)
+    // 绘制每日一言区域
+    this.drawDailyTxt(ctx,data)
 
+    ctx.draw()
+
+    
+  },
+  drawStyle1:function(){
+    // 只需要当天的数据
+    let data = this.data.history[this.data.history.length - 1]
+    const ctx = wx.createCanvasContext('style1')
+    // 将canvas生成白色背景，避免生成的png图片背景是透明的
+    ctx.setFillStyle('#ffffff')
+    ctx.fillRect(0, 0, prop * 690, prop * 920)
+    // 日期板块
+    ctx.setStrokeStyle('#e0e0e0')
+    ctx.strokeRect(prop*76, prop*40, prop*164, prop*222)
+    // 日期头部
+    ctx.setFontSize(prop * 24)
+    ctx.setFillStyle('#333333')
+    ctx.fillText(data.month + '.' + data.day + '    ' + data.weekText, prop * 90, prop * 80)
+    // 分割线
+    ctx.lineWidth = prop * 2;
+    ctx.moveTo(prop * 76, prop * 100)
+    ctx.lineTo(prop * 240, prop * 100)
+    ctx.setStrokeStyle('#e0e0e0')
+    ctx.stroke()
+    // 农历
+    ctx.setFontSize(prop * 30)
+    ctx.setFillStyle('#333333')
+    this.verticalTxt(ctx, data.chiMonth + data.chiDay, prop * 104, prop * 138)
+    // 属相
+    ctx.setFontSize(prop * 24)
+    ctx.setFillStyle('#333333')
+    this.verticalTxt(ctx, data.gYear + '属' + data.animalYear, prop * 190, prop * 138, prop * 24)
+    // 中间分割
+    ctx.lineWidth = prop * 2;
+    ctx.moveTo(prop * 164, prop * 100)
+    ctx.lineTo(prop * 164, prop * 260)
+    ctx.setStrokeStyle('#e0e0e0')
+    ctx.stroke()
+    // 节日板块
+    if(data.festival) {
+      // 矩形框
+      ctx.setStrokeStyle('#e0e0e0')
+      ctx.strokeRect(prop * 76, prop * 260, prop * 164, prop * 54)
+      ctx.setFillStyle('#ffffff')
+      // 清除上边框
+      ctx.setStrokeStyle('#e0e0e0')
+      ctx.clearRect(prop * 77, prop * 261, prop * 162, prop*2)
+      // 节日名
+      ctx.setFontSize(prop * 24)
+      ctx.setFillStyle('#333333')
+      ctx.fillText(data.festival, prop * 135, prop * 300)
+    }
+    // icon
+    let icon = '../images/logo-icon@3x.png'
+    ctx.drawImage(icon, prop * 132, prop * 576, prop * 50, prop * 79);
+    // 每日图片,先下载到本地，再绘图
+    let image,that = this
+    wx.downloadFile({
+      url: data.largeImage,
+      success:function(res){
+        console.log(res.tempFilePath)
+        ctx.drawImage(res.tempFilePath, prop * 310, prop * 40, prop * 340, prop * 606);
+        // 绘制每日一言区域
+        that.drawDailyTxt(ctx, data)
+        ctx.draw()
+      }
+    })
+    
+  },
+  drawDailyTxt:function(ctx,data){
     // 分隔线条
     ctx.beginPath()
     ctx.lineWidth = prop * 2;
-    ctx.moveTo(prop * 40, prop * 666)
-    ctx.lineTo(prop * 650, prop * 666)
+    ctx.moveTo(prop * 40, prop * 686)
+    ctx.lineTo(prop * 650, prop * 686)
     ctx.setStrokeStyle('#e0e0e0')
     ctx.stroke()
     // 第几天
     ctx.setFontSize(prop * 30)
     ctx.setFillStyle('#c30d23')
-    if (data.largerIndex){
-      ctx.fillText('【第' + data.largerIndex + '天】', prop * 25, prop * 715)
+    if (data.largerIndex) {
+      ctx.fillText('【第' + data.largerIndex + '天】', prop * 25, prop * 728)
     }
     // 每日描述
     ctx.beginPath()
     ctx.setFillStyle('#333333')
-    ctx.setFontSize(prop * 30)    
-    this.drawText(ctx, data.dayText, prop * 40, prop * 755)
-    // ctx.fillText(data.dayText, prop * 40, prop * 770)
-
-    ctx.draw()
-
+    ctx.setFontSize(prop * 30)
+    this.drawText(ctx, data.dayText, prop * 40, prop * 775)
+  },
+  // 生成图片并保存到本地相册
+  saveImage: function (id) {
+    let that = this
     wx.canvasToTempFilePath({
-      canvasId: 'style0',
-      success: function(res){
+      canvasId: id,
+      success: function (res) {
         console.log(res.tempFilePath)
         wx.saveImageToPhotosAlbum({
           filePath: res.tempFilePath,
-          success:function(response){
+          success: function (response) {
             that.setData({
               showPop: false
             })
@@ -379,12 +469,16 @@ Page({
     })
   },
   // 文字竖排显示
-  verticalTxt: function (ctx,str,x,y){
+  verticalTxt: function (ctx,str,x,y,fontsize){
     let arr = str.split('')
     for(let i = 0,len = str.length; i < len; i ++) {
       // 将中间圆点位置右移12rpx
       if (arr[i] === '·') {
         ctx.fillText(arr[i], x + prop*12, y + prop * 34 * i)
+      }
+      // 小号字体 缩小间距
+      else if(fontsize) {
+        ctx.fillText(arr[i], x, y + prop * 28 * i)
       }
       else {
         ctx.fillText(arr[i], x, y + prop * 34 * i)
@@ -410,8 +504,6 @@ Page({
     else{
       ;
     }
-    console.log(y)
-
     for (let i = 0; i < rowCount; i++) {
       if(i === 0) {
         ctx.fillText(str.substring(0, 20), x, y + (prop * 34 * 1.19 * i));  //prop * 34 * 1.19 表示文字的行高
@@ -421,7 +513,7 @@ Page({
         return 
       }
       else {
-        ctx.fillText(str.substring(20 * i, 20 * (i + 1)), x, y + (prop * 34 * 1.19 * i));        
+        ctx.fillText(str.substring(20 * i, 20 * (i + 1)), x, y + (prop * 34 * 1.19 * i));      
       }
     }
     
@@ -456,12 +548,12 @@ Page({
       current: this.data.history.length - 1
     })
   },
-  // 切换样式
+  // 跳转至切换样式
   switchStyle:function(){
     // 传入当天的数据给切换样式页面
     let obj = JSON.stringify(this.data.history[this.data.history.length - 1])
     wx.navigateTo({
-      url: '../changestyle/changestyle?obj=' + obj + '&index='+this.data.currentStyle
+      url: '../changestyle/changestyle?obj=' + obj + '&index='+ this.data.currentStyle
     })
   },
   // 点击前进

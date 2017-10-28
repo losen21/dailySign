@@ -1,4 +1,6 @@
 <!--logs.wxml-->
+<import src='../toast/toast.wxml'/>
+<template is="toast" data="{{ ..._toast_ }}"/>
 
 <view class='main'>
   <view class='daily-sign style1' wx:if='{{style0}}'>
@@ -121,8 +123,8 @@
     </view>
   </view>
   <view class='big-btn'>
+    <button class='new-btn' open-type="share">分享</button>
     <button class='new-btn' bindtap='saveSign'>保存日签</button>
-    <button class='new-btn' bindtap='shareNow' open-type="share">分享</button>
   </view>
 </view>
 <view class='canvas-group'>

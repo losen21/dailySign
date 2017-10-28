@@ -14,11 +14,14 @@ page {
   width:100%;
   height:100%;
   background-color: #efeff4;
+  overflow-y: hidden; 
 }
 /*canvas开始  */
 .canvas-group {
   margin:32rpx 30rpx;
-  display: none;
+}
+.canvas-group canvas {
+  margin-bottom: 25rpx;
 }
 swiper {
   height: 974rpx;
@@ -217,7 +220,7 @@ canvas {
 
 /*样式二开始  */
 .style2 .detali-section{
-  padding: 30rpx;
+  padding: 40rpx;
   padding-left: 0;
   width: 340rpx;
   height: 606rpx;
@@ -237,8 +240,8 @@ canvas {
 }
 .style2 .date-detail-content {
   display: flex;
-   /* justify-content: center; */
-  align-items: center; 
+  height: 170rpx;
+  color: #333333;
 }
 .style2 .date-section-content {
   width: 164rpx;
@@ -246,22 +249,19 @@ canvas {
   border: solid 1px #e0e0e0;
 }
 .style2 .temp-content {
-  width: 34rpx;
+  /* width: 34rpx; */
 }
 .style2 .left-content {
   padding:16rpx 30rpx 18rpx 28rpx;
   border-right: solid 1px #e0e0e0;
-  font-size: 15px;
+  font-size: 30rpx;
   line-height: 1.13;
-  color: #333333;
 }
 .style2 .right-content {
-  padding: 14rpx 20rpx 14rpx 18rpx;
-  
-  font-size: 12px;
+  padding: 16rpx 20rpx 14rpx 18rpx;
+  font-size: 24rpx;
   line-height: 1.17;
   text-align: center;
-  color: #333333;
 }
 .style2 .desc-section {
   height: 200rpx;
@@ -279,11 +279,7 @@ canvas {
   margin-bottom: 0;
   line-height: 1;
 }
-.style2 .date-detail-content {
-  font-size: 34rpx;
-  color: #333333;
-  line-height: 1;
-}
+
 .style2 .date-num-content {
   display: flex;
   justify-content: space-around;

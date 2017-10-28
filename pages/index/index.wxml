@@ -162,14 +162,12 @@
       <view class='close-icon'></view>
     </view>
   </view>
-  <!-- <button bindtap='saveSign' style='position:absolute;top:980rpx;left:50rpx;height:90rpx;'>Creat Canvas</button> -->
+   <!-- <button bindtap='saveSign' style='position:absolute;top:980rpx;left:50rpx;height:90rpx;'>Creat Canvas</button>  -->
 </view>
 
-<!-- <button class='btn left-btn' bindtap='saveSign'>保存日签</button>
-<button class='btn right-btn' bindtap='shareNow' open-type="share">立马分享</button>   -->
 
 <view class='canvas-group'>
-  <canvas canvas-id='style0' wx:if='{{style0}}'></canvas>
-  <canvas canvas-id='style1' wx:if='{{style1}}'></canvas>
-  <canvas canvas-id='style2' wx:if='{{style2}}'></canvas>
+  <canvas canvas-id='style1'></canvas>
+  <canvas canvas-id='style0'></canvas>
+  <!-- <canvas canvas-id='style2'></canvas> -->
 </view>

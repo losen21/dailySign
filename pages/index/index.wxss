@@ -49,7 +49,7 @@
   margin: 20rpx auto 0; 
 }
 .back-today {
-  margin-top: 118rpx;
+  margin-top: 116rpx;
 }
 .switch-icon {
   width: 50rpx;
@@ -136,7 +136,7 @@ button {
   padding: 0;
   border: 0;
   background-color: #fff;
-  border-radius: 8rpx;
+  border-radius: none;
   position: static;
 }
 button::after {
@@ -160,7 +160,7 @@ button::after {
   color: #333333;
 }
 .right-btn {
-  color: #d0aa60;
+  color: #d03f3f;
 }
 .close-content {
   position: absolute;

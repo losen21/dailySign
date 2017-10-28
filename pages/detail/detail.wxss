@@ -10,9 +10,9 @@
 .new-btn {
   width: 326rpx;
   height: 80rpx;
-  border-radius: 4px;
-  background-color: #d0aa60;
-  font-size: 17px;
+  border-radius: 8rpx;
+  background-color: #d03f3f;
+  font-size: 34rpx;
   line-height: 80rpx; 
   text-align: center;
   color: #ffffff;
