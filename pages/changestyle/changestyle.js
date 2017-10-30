@@ -45,6 +45,7 @@ Page({
       prePage.changeStyleData(currentStyleIndex)
     }
     app.globalData.currentStyle = currentStyleIndex
+    wx.setStorageSync('currentStyle', currentIndex)
   },
   // 滑动选择
   changeIndex:function(e){
@@ -62,11 +63,28 @@ Page({
       prePage.changeStyleData(currentIndex)
     }
     app.globalData.currentStyle = currentIndex
+    wx.setStorageSync('currentStyle', currentIndex)
   },
   /**
    * 用户点击右上角分享
    */
-  onShareAppMessage: function () {
-  
+  onShareAppMessage: function (res) {
+    let that = this
+    if (res.from === 'button') {
+      // 来自页面内转发按钮
+      console.log(res.target)
+    }
+    return {
+      title: '每日一签',
+      desc: '最具人气的签到小程序',
+      path: 'pages/index/index',
+      imageUrl: 'https://qiniu.image.cq-wnl.com/sentenceimg/2017103024b9b0572e2d47139d0d5798fc1208d3.jpg',
+      success: function (res) {
+        // 转发成功
+      },
+      fail: function (res) {
+        // 转发失败
+      }
+    }
   }
 })

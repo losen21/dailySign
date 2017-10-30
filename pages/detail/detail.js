@@ -9,6 +9,7 @@ Page({
     style0: true,
     style1: false,
     style2: false,
+    showLoading: false
   },
   onLoad: function (options) {
     // 初始化toast
@@ -28,6 +29,9 @@ Page({
   saveSign: function () {
     let canvasId = ''
     let that = this
+    this.setData({
+      showLoading: true
+    })
     if (this.data.style0) {
       canvasId = 'style0'
       this.drawStyle0()
@@ -60,7 +64,7 @@ Page({
     ctx.fillRect(0, 0, prop * 690, prop * 920)
     // 二维码
     let qrcode = '../images/qrcode.jpg'
-    ctx.drawImage(qrcode, prop * 160, prop * 576, prop * 100, prop * 100);
+    ctx.drawImage(qrcode, prop * 180, prop * 576, prop * 100, prop * 100);
     // 日期板块
     ctx.setFillStyle('#333333')
     ctx.setFontSize(prop * 34)
@@ -173,7 +177,10 @@ Page({
     }
     // icon
     let icon = '../images/logo-icon@3x.png'
-    ctx.drawImage(icon, prop * 132, prop * 576, prop * 50, prop * 79);
+    ctx.drawImage(icon, prop * 132, prop * 436, prop * 50, prop * 79);
+    // 二维码
+    let qrcode = '../images/qrcode.jpg'
+    ctx.drawImage(qrcode, prop * 106, prop * 546, prop * 100, prop * 100);
     // 每日图片,先下载到本地，再绘图
     let image, that = this
     wx.downloadFile({
@@ -218,13 +225,16 @@ Page({
         wx.saveImageToPhotosAlbum({
           filePath: res.tempFilePath,
           success: function (response) {
-            that.setData({
-              showPop: false
-            })
-            if (system === 'Android') {
-              return
-            }
+            // 阻止安卓弹出自定义toast
+            // if (system === 'Android') {
+            //   return
+            // }
             that.show('日签已保存到本地')
+          },
+          complete:function(){
+            that.setData({
+              showLoading: false
+            })
           }
         })
       }
@@ -281,6 +291,7 @@ Page({
 
   },
   onShareAppMessage: function (res) {
+    let that = this
     if (res.from === 'button') {
       // 来自页面内转发按钮
       console.log(res.target)
@@ -288,13 +299,18 @@ Page({
     return {
       title: '每日一签',
       desc: '最具人气的签到小程序',
-      path: '/page/detail',
-      imgUrl: 'https://mobile.51wnl.com/temporary/dailysign/style3-choose-icon@2x.png',
+      path: 'pages/index/index',
+      imageUrl: 'https://qiniu.image.cq-wnl.com/sentenceimg/2017103024b9b0572e2d47139d0d5798fc1208d3.jpg',
       success: function (res) {
         // 转发成功
+        if (system === 'Android') {
+          return
+        }
+        that.show('分享成功')
       },
       fail: function (res) {
         // 转发失败
+        // that.show('分享失败')
       }
     }
   }

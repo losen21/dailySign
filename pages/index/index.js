@@ -7,6 +7,16 @@ let HistoryData = 0
 const app = getApp()
 const prop = app.globalData.Proportion
 const system = app.globalData.system
+// touch相关
+let touchDot = 0,time = 0,interval = ""
+// 请求次数
+let reqIndex = 0;
+// 最终数据
+let DATA = []
+// 请求的日期
+let reqDate = ''
+// 请求多少天
+let dates = 3
 
 Page({
   data: {
@@ -29,7 +39,8 @@ Page({
     style0: true,
     style1: false,
     style2: false,
-    currentStyle: 0
+    currentStyle: 0,
+    showLoading: false
   },
   onLoad: function (e) {
     let app = getApp()
@@ -44,11 +55,15 @@ Page({
     }
     else {
       this.uid = this.uuid()
-      let firstTime = util.formatTime(new Date()).split(' ')[0];
+      // let firstTime = util.formatTime(new Date()).split(' ')[0];
       // 本地存储uid 和 第一次使用的日期
       wx.setStorageSync('uid', this.uid)
-      wx.setStorageSync('firstTime', firstTime)
+      // wx.setStorageSync('firstTime', firstTime)
       console.log(wx.getStorageSync('uid'))
+    }
+    // 初始化已选样式
+    if (wx.getStorageSync('currentStyle')) {
+      this.changeStyleData(wx.getStorageSync('currentStyle'))
     }
     // 如果有本地数据
     if (HistoryData) {
@@ -68,6 +83,7 @@ Page({
       })
     }
     else {
+      // 获取每日信息
       this.getDailyInfo()
     }
     
@@ -167,13 +183,21 @@ Page({
     return result
   },
   // 获取签到信息
-  getDailyInfo: function(date){
-    let datekey = wx.getStorageSync('firstTime')
-    let enddatekey = util.formatTime(new Date()).split(' ')[0]
+  getDailyInfo: function(startDate,endDate,flushreq){
+    // let datekey = wx.getStorageSync('firstTime')
+
+    let enddatekey = endDate ? endDate : util.formatTime(new Date()).split(' ')[0]
+    let datekey = startDate ? startDate : this.getDate(enddatekey)
+    // 记录每次请求的结束日期
+    reqDate = enddatekey
+
+    console.log('enddatekey:' + enddatekey + '   ' + 'datekey' + datekey)
     // 计算首次使用日期和当前日期差值，最多显示一个月的数据
-    let diff = this.getDateDiff(datekey, enddatekey)
-    console.log(diff)
-    datekey = diff > 31 ? 31 : datekey
+    // let diff = this.getDateDiff(datekey, enddatekey)
+    // console.log('使用时间相差天数' + diff)
+    console.log('30天前的日期:' + this.getDate(enddatekey))
+
+    // datekey = diff > 31 ? this.getDate(enddatekey) : datekey
     
     // 在第二天进行操作时
     if (wx.getStorageSync('useDate')) {
@@ -196,7 +220,7 @@ Page({
       data: {
         uid: that.uid,
         did: '',
-        datekey: '2017-10-24',
+        datekey: datekey,
         enddatekey: enddatekey
       },
       dataType: 'json',
@@ -206,15 +230,6 @@ Page({
       success: function (res) {
         let data = res.data.data
         let todayIndex = 0
-        // 调试
-        // data[20].rIndex = 24
-        // data[19].rIndex = 23
-        // data[3].rIndex = 1
-        data[3].festival = '端午节'
-        // 调试
-        // that.data.todayIndex = data[data.length - 1].rIndex  //保存当天已签到天数
-        // data[data.length - 1].rIndex = 0  //设置当天已签到天数为0
-
         for (let i = 0, len = data.length; i < len; i++) {
           data[i].year = data[i].dateKey.split('-')[0]
           data[i].month = data[i].dateKey.split('-')[1]
@@ -239,13 +254,21 @@ Page({
             todayIndex = data[i].rIndex
           }
         }
-        // console.log(todayIndex)
+        // if (data.length === 1) {
+        //   that.setData({
+        //     firstSlide: true,
+        //     lastSlide: true
+        //   })
+        // }
+        DATA = DATA.reverse().concat(data.reverse())
         that.setData({
-          history: data,
-          current: data.length - 1,
+          history: DATA.reverse(),
+          current: flushreq ? DATA.length - dates * reqIndex : dates-1,
           todayIndex: todayIndex  // 设置为之前已签到的天数
         })
-        console.log(that.data.history)
+        reqIndex += 1
+        console.log(DATA)
+        
         // 如果当天已签到
         if (wx.getStorageSync('signed')) {
           console.log(that.data.todayIndex)
@@ -258,23 +281,38 @@ Page({
       }
     })
   },
+  // 计算日期相差天数
   getDateDiff: function (startDate, endDate){
-    var startTime = new Date(Date.parse(startDate.replace(/-/g, "/"))).getTime();
-    var endTime = new Date(Date.parse(endDate.replace(/-/g, "/"))).getTime();
-    var dates = Math.abs((startTime - endTime)) / (1000 * 60 * 60 * 24);
+    let startTime = new Date(Date.parse(startDate.replace(/-/g, "/"))).getTime();
+    let endTime = new Date(Date.parse(endDate.replace(/-/g, "/"))).getTime();
+    let dates = Math.abs((startTime - endTime)) / (1000 * 60 * 60 * 24);
     return dates;
+  },
+  // 计算当前日期的前30天日期  isPre代表前一天
+  getDate: function (endDate,isPre){
+    let startTime
+    let endTime = Date.parse(new Date(endDate))/1000;   //传入值的时间戳
+    startTime = endTime - (dates-1) * (60 * 60 * 24)     //30天前的时间戳
+    if(isPre) {
+      startTime = endTime - dates * (60 * 60 * 24)
+    }
+    let date = new Date(startTime * 1000).toLocaleDateString().replace(/\//g,'-')
+    return date
   },
   
   // 保存图片
   saveSign:function(){
     let canvasId = ''
     let that = this
+    this.setData({
+      showLoading: true
+    })
     if (this.data.style0) {
       canvasId = 'style0'
       this.drawStyle0()
       setTimeout(function(){
         that.saveImage('style0')
-      }, 1500)
+      }, 2500)
     }
     if (this.data.style1) {
       canvasId = 'style1'
@@ -282,7 +320,7 @@ Page({
       // 防止图片还未绘制完成就保存 ps 官方drawImage方法还未加入绘制完成回调，用延时处理
       setTimeout(function(){
         that.saveImage('style1')
-      }, 1500)
+      }, 2500)
     }
     if (this.data.style2) {
       canvasId = 'style2'
@@ -465,10 +503,16 @@ Page({
             that.setData({
               showPop: false
             })
-            if (system === 'Android') {
-              return
-            }
+            // 阻止安卓弹出自定义toast
+            // if (system === 'Android') {
+            //   return
+            // }
             that.show('日签已保存到本地')
+          },
+          complete:function(){
+            that.setData({
+              showLoading: false
+            })
           }
         })
       }
@@ -540,9 +584,18 @@ Page({
   },
   // 滑动监听
   changeIndex: function(e){
+    // 当滑动到倒数第二个，再次请求
+    let enddatekey = this.getDate(reqDate, true)
+    let datekey = this.getDate(enddatekey)
+
+    console.log(e.detail.current)
+
+    if(e.detail.current === 0) {
+      this.getDailyInfo(datekey, enddatekey, true)
+    }
     this.setData({
       isToday: (e.detail.current === this.data.history.length - 1) ? true : false,      
-      firstSlide: e.detail.current === 0 ? true : false
+      // firstSlide: e.detail.current === 0 ? true : false
     })
     this.setData({
       lastSlide: this.data.isToday ? true : false
@@ -576,36 +629,36 @@ Page({
       current: currentIndex + 1
     })
   },
+  touchStart:function(e){
+    touchDot = e.touches[0].pageX; // 获取触摸时的原点
+    // 使用计时器记录时间  
+    interval = setInterval(function () {
+      time++;
+    }, 100);
+  },
   // 处理临界点的滑动
-  handletouchmove:function(e){
-    // console.log(e.currentTarget.dataset.index)
+  touchMove:function(e){
     let that = this
-    // 第一张和最后一张
+    //只处理第一张和最后一张
     if (e.currentTarget.dataset.index === that.data.history.length - 1 || e.currentTarget.dataset.index === 0){
-      let currentX = e.touches[0].pageX
-      let currentY = e.touches[0].pageY
-      let tx = currentX - that.data.lastX
-      let ty = currentY - that.data.lastY
-      //左右方向滑动
-      if (Math.abs(tx) > Math.abs(ty)) {
-        // 向左滑动
-        if (tx < 0) {
-          if (e.currentTarget.dataset.index === that.data.history.length - 1) {
-            that.show('明天，敬请期待~')
-          }
+      let moveX = e.touches[0].pageX;
+      // 第一张左滑
+      if (moveX - touchDot <= -40 && time < 10) {
+        if (e.currentTarget.dataset.index === that.data.history.length - 1) {
+          that.show('明天，敬请期待~')
         }
-        // 向右滑动
-        else if (tx > 0) {
-          if (e.currentTarget.dataset.index === 0) {
-            that.show('只能到这里咯！')
-          }
-        }
-
       }
-      //将当前坐标进行保存以进行下一次计算
-      that.data.lastX = currentX
-      that.data.lastY = currentY
+      // 最后一张右滑
+      if (moveX - touchDot >= 40 && time < 10) {
+        if (e.currentTarget.dataset.index === 0) {
+          that.show('只能到这里咯！')
+        }
+      }
     }
+  },
+  touchEnd:function(e){
+    clearInterval(interval); // 清除setInterval
+    time = 0;
   },
   onShareAppMessage: function (res) {
     let that = this
@@ -616,18 +669,21 @@ Page({
     return {
       title: '每日一签',
       desc: '最具人气的签到小程序',
-      path: '/page/index',
-      imgUrl: 'https://mobile.51wnl.com/temporary/dailysign/style3-choose-icon@2x.png',
+      path: 'pages/index/index',
+      imageUrl: 'https://qiniu.image.cq-wnl.com/sentenceimg/2017103024b9b0572e2d47139d0d5798fc1208d3.jpg',
       success: function (res) {
         // 转发成功
         that.setData({
           showPop: false
         })
+        if (system === 'Android') {
+          return
+        }
         that.show('分享成功')
       },
       fail: function (res) {
         // 转发失败
-        that.show('分享失败')
+        // that.show('分享失败')
       }
     }
   }

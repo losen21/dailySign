@@ -132,4 +132,7 @@
   <canvas canvas-id='style1'></canvas>
   <!-- <canvas canvas-id='style2'></canvas> -->
 </view>
+<view>
+   <loading wx:if="{{showLoading}}">请稍后</loading> 
+</view>
 

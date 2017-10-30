@@ -1,10 +1,4 @@
 /**index.wxss**/
-.index {
-  /* width: 100%; */
-  /* height: 100%; */
-  /* position: absolute; */
-}
-/*canvas开始  */
 
 /*签到模块sign-content 开始  */
 .sign-content {
@@ -90,7 +84,7 @@
   left: 96rpx;
   width: 560rpx;
   /* height: 314rpx; */
-  border-radius: 4px;
+  border-radius: 8rpx;
   background-color: #ffffff;
   z-index: 3;
 }
@@ -99,15 +93,17 @@
   line-height: 1;
   text-align: center;
   color: #333333;
-  margin: 40rpx 0 28rpx;
+  margin: 40rpx 0 0;
 }
 .pop-content {
   display: flex;
   align-items: center;
   justify-content: center;
-
-  padding-bottom: 40rpx;
-  border-bottom: 2rpx solid #e5e5e5
+  height: 140rpx;
+  /* padding-bottom: 40rpx; */
+  border-bottom: 2rpx solid #e5e5e5;
+  background: url('https://mobile.51wnl.com/temporary/dailysign/days-icon@2x.png') no-repeat center;
+  background-size: 228rpx 72rpx;
 }
 .pop-line {
   width: 50rpx;
@@ -115,14 +111,15 @@
   background-color: #d0aa60;
 }
 .pop-day {
-  font-family: SFProDisplay;
-  font-size: 72rpx;
+  font-size: 48rpx;
   font-weight: 600;
   line-height: 1;
   text-align: center;
-  color: #d0aa60;
+  color: #ffffff;
   margin: 0 40rpx;
-  /* text-align: left; */
+}
+.signdays {
+  font-family: SFProDisplay;
 }
 
 .pop-btn{
@@ -136,7 +133,7 @@ button {
   padding: 0;
   border: 0;
   background-color: #fff;
-  border-radius: none;
+  border-radius: 0;
   position: static;
 }
 button::after {
@@ -157,9 +154,11 @@ button::after {
 }
 .left-btn {
   border-right: 2rpx solid #e5e5e5;
+  border-bottom-left-radius: 8rpx;
   color: #333333;
 }
 .right-btn {
+  border-bottom-right-radius: 8rpx;
   color: #d03f3f;
 }
 .close-content {
@@ -211,5 +210,9 @@ button::after {
   .today-icon {
     background: url('https://mobile.51wnl.com/temporary/dailysign/today-icon@3x.png') no-repeat center;
     background-size: cover;
+  }
+  .pop-content {
+    background: url('https://mobile.51wnl.com/temporary/dailysign/days-icon@3x.png') no-repeat center;
+    background-size: 228rpx 72rpx;
   }
 }
