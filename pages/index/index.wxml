@@ -162,7 +162,7 @@
       <view class='close-icon'></view>
     </view>
   </view>
-    <button bindtap='saveSign' style='position:absolute;top:980rpx;left:50rpx;height:90rpx;'>Creat Canvas</button>  
+  <!-- <button bindtap='saveSign' style='position:absolute;top:980rpx;left:50rpx;height:90rpx;'>Creat Canvas</button>   -->
 </view>
 
 
