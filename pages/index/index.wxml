@@ -6,8 +6,8 @@
   <swiper autoplay="{{autoplay}}" duration="{{duration}}" bindchange="changeIndex" current='{{current}}'>
       <block wx:for="{{history}}" wx:for-index="index" wx:key='index'>
         <swiper-item bindtap='display' data-index='{{index}}' bindtouchstart="touchStart" bindtouchmove="touchMove" bindtouchend="touchEnd">
-          <view class='left-icon slide-icon' wx:if="{{!firstSlide}}" catchtap='prev' data-current="{{index}}"></view>
-          <view class='right-icon slide-icon' wx:if="{{!lastSlide}}" catchtap='next' data-current="{{index}}"></view> 
+          <view class="{{index == 0 ? 'left-icon slide-icon hidden' :'left-icon slide-icon show'}}" catchtap='prev' data-current="{{index}}"></view>
+          <view class="{{index == history.length-1 ? 'right-icon slide-icon hidden' :'right-icon slide-icon show'}}" catchtap='next' data-current="{{index}}"></view> 
             <view class='daily-sign style1' wx:if='{{style0}}'>
               <view class='inside-content'>
                 <view class='date-section'>
@@ -130,7 +130,6 @@
         </swiper-item>
       </block>
   </swiper>
-  <input type='number'>三点多</input>
   <view wx:if='{{isToday}}'>
     <view class='sign-content'>
       <view class='tip'>{{tiptxt}}</view>

@@ -10,19 +10,17 @@ const system = app.globalData.system
 // touch相关
 let touchDot = 0,time = 0,interval = ""
 // 请求次数
-let reqIndex = 1;
+let reqIndex = 0
 // 最终数据
 let DATA = []
 // 请求的日期
 let reqDate = ''
-// 请求多少天
-let dates = 3
+// 请求天数, 实际请求天数 = dates + 1 ,因为getPointDate()方法多算了一天
+let dates = 9
 // 分享的天数序号
 let shareIndex
 // 之前签到的天数
 let signDays = 0
-// 当前currentIndex数值
-let nowIndex
 
 
 Page({
@@ -33,10 +31,10 @@ Page({
     signed: false,
     signdays: '',
     // todayIndex: 0,   //当天的已签到天数
-    history: [],
+    history: {},
     autoplay: false,
     duration: '300',
-    current: dates-1,
+    current: dates,
     showPop: false,
     isToday: true,
     lastSlide: true,
@@ -52,8 +50,8 @@ Page({
     // 处理分享过来的日期 分享的天数超过一个月，就显示今天
     let index = parseInt(options.current)
     if (index) {
-      if (index <= 30 && index >= 0) {
-        shareIndex = parseInt(options.current);
+      if (index < 30 && index >= 0) {
+        shareIndex = index
       }
       else {
         shareIndex = 30
@@ -120,7 +118,13 @@ Page({
     }
     else {
       // 获取每日信息
-      this.getDailyInfo()
+      this.getDailyInfo('','',0)
+      // if (shareIndex) {
+      //   console.log('分享的序号：' + shareIndex)
+      //   that.setData({
+      //     current: shareIndex
+      //   })
+      // }
     }
     
   },
@@ -155,9 +159,9 @@ Page({
           if (res.data.status === 200) {
             let date = util.formatTime(new Date()).split(' ')[0]
             // 签到成功后重新请求当天数据，并替换之前的数据
-            that.getDailyInfo(date,date)
+            that.getDailyInfo(date,date,0)
             // let userData = that.data.history
-            // console.log(userData)
+            // console.log('userData:' + userData[0].year)
             // let rindex = userData[userData.length - 1].rIndex
             // userData[userData.length - 1].largerIndex = that.NumberToChinese(rindex)
 
@@ -176,9 +180,9 @@ Page({
   },
   // 生成唯一用户标识uid
   uuid: function() {
-    var d = new Date().getTime();
-    var uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
-        var r = (d + Math.random() * 16) % 16 | 0;
+    let d = new Date().getTime();
+    let uuid = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+        let r = (d + Math.random() * 16) % 16 | 0;
         d = Math.floor(d / 16);
         return (c == 'x' ? r : (r & 0x3 | 0x8)).toString(16);
     });
@@ -188,10 +192,10 @@ Page({
     if (!/^\d*(\.\d*)?$/.test(num)) { 
       alert("Number is wrong!"); return "Number is wrong!"; 
     }
-    var AA = new Array("〇", "一", "二", "三", "四", "五", "六", "七", "八", "九");
-    var BB = new Array("", "十", "百", "千", "万", "亿", "点", "");
-    var a = ("" + num).replace(/(^0*)/g, "").split("."), k = 0, re = "";
-    for (var i = a[0].length - 1; i >= 0; i--) {
+    let AA = new Array("〇", "一", "二", "三", "四", "五", "六", "七", "八", "九");
+    let BB = new Array("", "十", "百", "千", "万", "亿", "点", "");
+    let a = ("" + num).replace(/(^0*)/g, "").split("."), k = 0, re = "";
+    for (let i = a[0].length - 1; i >= 0; i--) {
       switch (k) {
         case 0: re = BB[7] + re; break;
         case 4: if (!new RegExp("0{4}\\d{" + (a[0].length - i - 1) + "}$").test(a[0]))
@@ -205,7 +209,7 @@ Page({
     if (a.length > 1) //加上小数部分(如果有小数部分) 
     {
       re += BB[6];
-      for (var i = 0; i < a[1].length; i++) re += AA[a[1].charAt(i)];
+      for (let i = 0; i < a[1].length; i++) re += AA[a[1].charAt(i)];
     }
     return re;
   },
@@ -225,7 +229,7 @@ Page({
     // let datekey = wx.getStorageSync('firstTime')
 
     let enddatekey = endDate ? endDate : util.formatTime(new Date()).split(' ')[0]
-    let datekey = startDate ? startDate : this.getDate(enddatekey)
+    let datekey = startDate ? startDate : this.getPointDate(enddatekey, -dates)
     // 记录每次请求的结束日期
     reqDate = enddatekey
 
@@ -233,7 +237,7 @@ Page({
     // 计算首次使用日期和当前日期差值，最多显示一个月的数据
     // let diff = this.getDateDiff(datekey, enddatekey)
     // console.log('使用时间相差天数' + diff)
-    console.log('30天前的日期:' + this.getDate(enddatekey))
+    console.log('30天前的日期:' + this.getPointDate(enddatekey, -dates))
 
     // datekey = diff > 31 ? this.getDate(enddatekey) : datekey
     
@@ -288,41 +292,15 @@ Page({
         }
         else {
           DATA = DATA.reverse().concat(data.reverse())
-          if(shareIndex) {
-            console.log('分享的序号：' + shareIndex)
-            that.setData({
-              current: shareIndex
-            })
-          }
-          else {
-            if(flushreq) {
-              reqIndex = reqIndex + 1
-              console.log('当前请求次数：' + (reqIndex))
-              console.log('当前索引：' + (nowIndex + dates * (reqIndex - 1)))
-              that.setData({
-                current: DATA.length - dates * (reqIndex-1),
-              })
-            }
-            else {
-              // that.setData({
-              //   current: dates - 1,
-              // })
-            }
-            // that.setData({
-            //   current: flushreq ? (DATA.length - dates * reqIndex + 1) : (dates - 1),
-            // })
-          }
+          that.setData({
+            current: flushreq ? dates + 2 : dates
+          })
         }
         console.log('todayIndex:' + todayIndex)
-        // if(!startDate && !endDate && !flushreq) {
-        //   signDays = todayIndex
-        // }
+
         that.setData({
           history: DATA.reverse(),
-          // todayIndex: signDays,  // 设置为之前已签到的天数
         })
-        
-        console.log(DATA)
         console.log(that.data.history)
         
         // 如果当天已签到
@@ -348,12 +326,32 @@ Page({
   getDate: function (endDate,isPre){
     let startTime
     let endTime = Date.parse(new Date(endDate))/1000;   //传入值的时间戳
-    startTime = endTime - (dates-1) * (60 * 60 * 24)     //30天前的时间戳
-    if(isPre) {
+    if (isPre === 0) {     //30天前的时间戳
+      startTime = endTime - (dates - 1) * (60 * 60 * 24)
+    }
+    if(isPre === 1) {
       startTime = endTime - dates * (60 * 60 * 24)
     }
     let date = new Date(startTime * 1000).toLocaleDateString().replace(/\//g,'-')
+    console.log('getDate获取到的值:' + date)
     return date
+  },
+  // 计算当前日期endDate 的前后AddDayCount天 的日期
+  getPointDate: function (endDate, AddDayCount) { 
+    let num = Math.floor(AddDayCount);
+    let symbol = '/';
+    if (endDate.indexOf('-') > -1) {
+      symbol = '-';
+    } else if (endDate.indexOf('.') > -1) {
+      symbol = '.';
+    }
+    let myDate = new Date(endDate);
+    let lw = new Date(Number(myDate) + 1000 * 60 * 60 * 24 * num); //num天数
+    let lastY = lw.getFullYear();
+    let lastM = lw.getMonth() + 1;
+    let lastD = lw.getDate();
+    let startdate = lastY + symbol + (lastM < 10 ? "0" + lastM : lastM) + symbol + (lastD < 10 ? "0" + lastD : lastD);
+    return startdate; 
   },
   
   // 保存图片
@@ -654,12 +652,13 @@ Page({
   },
   // 滑动监听
   changeIndex: function(e){    
-    let enddatekey = this.getDate(reqDate, true)
-    let datekey = this.getDate(enddatekey)
+    let enddatekey = this.getPointDate(reqDate, -dates - 1)
+    let datekey = this.getPointDate(enddatekey, -dates)
 
+    console.log('当前swiper索引值：'+e.detail.current)
     // 当滑动到最后一个，再次请求
-    if (nowIndex === 1) {
-      this.getDailyInfo(datekey, enddatekey, true)
+    if (e.detail.current === 1) {
+      this.getDailyInfo(datekey, enddatekey, 1)
     }
     this.setData({
       isToday: (e.detail.current === this.data.history.length - 1) ? true : false,      
@@ -699,9 +698,6 @@ Page({
     })
   },
   touchStart:function(e){
-    // console.log(e)
-    nowIndex = e.currentTarget.dataset.index
-    console.log(nowIndex)
     
     touchDot = e.touches[0].pageX; // 获取触摸时的原点
     // 使用计时器记录时间  
@@ -745,7 +741,7 @@ Page({
       title: '每日一签',
       desc: '最具人气的签到小程序',
       path: 'pages/index/index?current=' + that.data.current,
-      imageUrl: 'https://qiniu.image.cq-wnl.com/sentenceimg/2017103024b9b0572e2d47139d0d5798fc1208d3.jpg',
+      // imageUrl: 'https://qiniu.image.cq-wnl.com/sentenceimg/2017103024b9b0572e2d47139d0d5798fc1208d3.jpg',
       success: function (res) {
         // 转发成功
         that.setData({
