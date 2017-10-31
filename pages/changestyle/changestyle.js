@@ -44,7 +44,6 @@ Page({
       //使用上一个页面的方法设置数据
       prePage.changeStyleData(currentStyleIndex)
     }
-    app.globalData.currentStyle = currentStyleIndex
     wx.setStorageSync('currentStyle', currentIndex)
   },
   // 滑动选择
@@ -62,7 +61,6 @@ Page({
       //关键在这里
       prePage.changeStyleData(currentIndex)
     }
-    app.globalData.currentStyle = currentIndex
     wx.setStorageSync('currentStyle', currentIndex)
   },
   /**

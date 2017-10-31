@@ -9,7 +9,8 @@ Page({
     style0: true,
     style1: false,
     style2: false,
-    showLoading: false
+    showLoading: false,
+    current: 0
   },
   onLoad: function (options) {
     // 初始化toast
@@ -17,11 +18,13 @@ Page({
 
     let data = JSON.parse(options.obj);
     let style = parseInt(options.style);
+    let current = parseInt(options.current);
     this.setData({
       style0: style === 0 ? true : false,
       style1: style === 1 ? true : false,
       style2: style === 2 ? true : false,
-      item: data
+      item: data,
+      current: current
     });
     console.log(data)
   },
@@ -64,40 +67,54 @@ Page({
     ctx.fillRect(0, 0, prop * 690, prop * 920)
     // 二维码
     let qrcode = '../images/qrcode.jpg'
-    ctx.drawImage(qrcode, prop * 180, prop * 576, prop * 100, prop * 100);
-    // 日期板块
-    ctx.setFillStyle('#333333')
-    ctx.setFontSize(prop * 34)
-    ctx.fillText(data.year + '年' + data.month + '月', prop * 140, prop * 152)
-    ctx.fillText('农历' + data.chiMonth + data.chiDay, prop * 130, prop * 210)
-    ctx.setFontSize(prop * 200)
-    ctx.fillText(data.day, prop * 115, prop * 420)
+    ctx.drawImage(qrcode, prop * 180, prop * 556, prop * 100, prop * 100);
+    
+    // 有节日时日期板块上移 50rpx
+    if(data.festival) {
+      ctx.setFillStyle('#333333')
+      ctx.setFontSize(prop * 34)
+      ctx.fillText(data.year + '年' + data.month + '月', prop * 140, prop * 102)
+      ctx.fillText('农历' + data.chiMonth + data.chiDay, prop * 130, prop * 160)
+      ctx.setFontSize(prop * 200)
+      ctx.fillText(data.day, prop * 115, prop * 370)
+    }
+    else {
+      // 无节日时日期板块
+      ctx.setFillStyle('#333333')
+      ctx.setFontSize(prop * 34)
+      ctx.fillText(data.year + '年' + data.month + '月', prop * 140, prop * 152)
+      ctx.fillText('农历' + data.chiMonth + data.chiDay, prop * 130, prop * 210)
+      ctx.setFontSize(prop * 200)
+      ctx.fillText(data.day, prop * 115, prop * 420)
+    }
+
     if (data.festival) {
       // 节日左边线条
       ctx.beginPath()
       ctx.lineWidth = prop * 2;
-      ctx.moveTo(prop * 118, prop * 516)
-      ctx.lineTo(prop * 168, prop * 516)
+      ctx.moveTo(prop * 118, prop * 466)
+      ctx.lineTo(prop * 168, prop * 466)
       ctx.setStrokeStyle('#333333')
       ctx.stroke()
       // 节日
       ctx.setFontSize(prop * 34)
       ctx.setFillStyle('#333333')
-      ctx.fillText(data.festival, prop * 196, prop * 525)
+      ctx.fillText(data.festival, prop * 178, prop * 475)
       // 节日右边线条
       ctx.lineWidth = prop * 2;
-      ctx.moveTo(prop * 292, prop * 516)
-      ctx.lineTo(prop * 342, prop * 516)
+      ctx.moveTo(prop * 292, prop * 466)
+      ctx.lineTo(prop * 342, prop * 466)
       ctx.setStrokeStyle('#333333')
       ctx.stroke()
-      // 中间线条
-      ctx.beginPath()
-      ctx.lineWidth = prop * 2;
-      ctx.moveTo(prop * 450, prop * 40)
-      ctx.lineTo(prop * 450, prop * 650)
-      ctx.setStrokeStyle('#e0e0e0')
-      ctx.stroke()
+      
     }
+    // 中间线条
+    ctx.beginPath()
+    ctx.lineWidth = prop * 2;
+    ctx.moveTo(prop * 450, prop * 40)
+    ctx.lineTo(prop * 450, prop * 650)
+    ctx.setStrokeStyle('#e0e0e0')
+    ctx.stroke()
     // icon
     let icon = '../images/logo-icon@3x.png'
     ctx.drawImage(icon, prop * 500, prop * 70, prop * 50, prop * 79);
@@ -299,8 +316,8 @@ Page({
     return {
       title: '每日一签',
       desc: '最具人气的签到小程序',
-      path: 'pages/index/index',
-      imageUrl: 'https://qiniu.image.cq-wnl.com/sentenceimg/2017103024b9b0572e2d47139d0d5798fc1208d3.jpg',
+      path: 'pages/index/index?current=' + that.data.current,
+      // imageUrl: 'https://qiniu.image.cq-wnl.com/sentenceimg/2017103024b9b0572e2d47139d0d5798fc1208d3.jpg',
       success: function (res) {
         // 转发成功
         if (system === 'Android') {

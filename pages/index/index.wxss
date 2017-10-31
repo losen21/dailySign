@@ -5,7 +5,7 @@
   display: flex;
   align-items: center;
   justify-content: flex-end;
-  margin-top: 18rpx;
+  margin-top: 8px;
 }
 .sign-content .tip {
   height: 60rpx;

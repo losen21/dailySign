@@ -130,6 +130,7 @@
         </swiper-item>
       </block>
   </swiper>
+  <input type='number'>三点多</input>
   <view wx:if='{{isToday}}'>
     <view class='sign-content'>
       <view class='tip'>{{tiptxt}}</view>

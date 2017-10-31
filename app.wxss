@@ -27,7 +27,7 @@ page {
   margin-bottom: 25rpx;
 }
 swiper {
-  height: 974rpx;
+  height: 954rpx;
 }
 canvas {
   width: 100%;
@@ -84,9 +84,6 @@ canvas {
   margin:20rpx auto 40rpx;
 }
 .date-num-content {
-  /* display: flex;
-  justify-content: space-around;
-  align-items: center; */
   margin-bottom: 60rpx;
   position: relative;
 }

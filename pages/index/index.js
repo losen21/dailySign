@@ -10,13 +10,20 @@ const system = app.globalData.system
 // touch相关
 let touchDot = 0,time = 0,interval = ""
 // 请求次数
-let reqIndex = 0;
+let reqIndex = 1;
 // 最终数据
 let DATA = []
 // 请求的日期
 let reqDate = ''
 // 请求多少天
 let dates = 3
+// 分享的天数序号
+let shareIndex
+// 之前签到的天数
+let signDays = 0
+// 当前currentIndex数值
+let nowIndex
+
 
 Page({
   data: {
@@ -25,15 +32,13 @@ Page({
     tiptxt: '你还没开始签到哦',
     signed: false,
     signdays: '',
-    todayIndex: 0,   //当天的已签到天数
+    // todayIndex: 0,   //当天的已签到天数
     history: [],
     autoplay: false,
     duration: '300',
-    current: 0,
+    current: dates-1,
     showPop: false,
     isToday: true,
-    lastX: 0,
-    lastY: 0,
     lastSlide: true,
     firstSlide: false,
     style0: true,
@@ -42,7 +47,19 @@ Page({
     currentStyle: 0,
     showLoading: false
   },
-  onLoad: function (e) {
+  onLoad: function (options) {
+    console.log(util.getCurrentPageUrlWithArgs())
+    // 处理分享过来的日期 分享的天数超过一个月，就显示今天
+    let index = parseInt(options.current)
+    if (index) {
+      if (index <= 30 && index >= 0) {
+        shareIndex = parseInt(options.current);
+      }
+      else {
+        shareIndex = 30
+      }
+    }
+
     let app = getApp()
     // toast组件实例
     new app.ToastPannel();
@@ -55,16 +72,35 @@ Page({
     }
     else {
       this.uid = this.uuid()
-      // let firstTime = util.formatTime(new Date()).split(' ')[0];
-      // 本地存储uid 和 第一次使用的日期
+      // 本地存储uid
       wx.setStorageSync('uid', this.uid)
-      // wx.setStorageSync('firstTime', firstTime)
       console.log(wx.getStorageSync('uid'))
     }
     // 初始化已选样式
     if (wx.getStorageSync('currentStyle')) {
       this.changeStyleData(wx.getStorageSync('currentStyle'))
     }
+    // 初始化签到天数
+    if (wx.getStorageSync('signDays')) {
+      signDays = wx.getStorageSync('signDays')
+    }
+
+    // 在第二天进行操作时
+    let useDate = util.formatTime(new Date()).split(' ')[0];
+    if (wx.getStorageSync('useDate')) {
+      // 同一天内使用
+      if (wx.getStorageSync('useDate') === useDate) {
+        console.log('今天又来啦~')
+      }
+      else {
+        wx.setStorageSync('useDate', useDate)
+        wx.setStorageSync('signed', false)
+      }
+    }
+    else {
+      wx.setStorageSync('useDate', useDate)
+    }
+
     // 如果有本地数据
     if (HistoryData) {
       let data = HistoryData.HistoryData;
@@ -117,18 +153,20 @@ Page({
         success: function (res) {
           console.log(res.data)
           if (res.data.status === 200) {
-            // 签到成功后重新请求列表
-            that.getDailyInfo()
-            let userData = that.data.history
-            let rindex = userData[userData.length - 1].rIndex
-            userData[userData.length - 1].largerIndex = that.NumberToChinese(rindex)
+            let date = util.formatTime(new Date()).split(' ')[0]
+            // 签到成功后重新请求当天数据，并替换之前的数据
+            that.getDailyInfo(date,date)
+            // let userData = that.data.history
+            // console.log(userData)
+            // let rindex = userData[userData.length - 1].rIndex
+            // userData[userData.length - 1].largerIndex = that.NumberToChinese(rindex)
 
             that.setData({
               signtxt: '已签到',
-              tiptxt: '已签到' + rindex + '天',
-              signdays: rindex,
+              tiptxt: '已签到' + signDays + '天',
+              signdays: signDays,
               showPop: true,
-              history: userData
+              // history: userData
             })
             wx.setStorageSync('signed', true)
           }
@@ -199,20 +237,6 @@ Page({
 
     // datekey = diff > 31 ? this.getDate(enddatekey) : datekey
     
-    // 在第二天进行操作时
-    if (wx.getStorageSync('useDate')) {
-      // 同一天内使用
-      if (wx.getStorageSync('useDate') === enddatekey) {
-        console.log('今天又来啦~')
-      }
-      else {
-        wx.setStorageSync('useDate', enddatekey)
-        wx.setStorageSync('signed', false)
-      }
-    }
-    else {
-      wx.setStorageSync('useDate', enddatekey)
-    }
     let that = this
     // 获取该用户签到情况
     wx.request({
@@ -254,28 +278,60 @@ Page({
             todayIndex = data[i].rIndex
           }
         }
-        // if (data.length === 1) {
-        //   that.setData({
-        //     firstSlide: true,
-        //     lastSlide: true
-        //   })
+       
+        // 只请求签到当天,替换当天的数据
+        if(startDate === endDate && startDate) {
+          DATA = DATA.reverse()
+          DATA[0] = data[0]
+          signDays = todayIndex  // 设置为之前已签到的天数
+          wx.setStorageSync('signDays', signDays)
+        }
+        else {
+          DATA = DATA.reverse().concat(data.reverse())
+          if(shareIndex) {
+            console.log('分享的序号：' + shareIndex)
+            that.setData({
+              current: shareIndex
+            })
+          }
+          else {
+            if(flushreq) {
+              reqIndex = reqIndex + 1
+              console.log('当前请求次数：' + (reqIndex))
+              console.log('当前索引：' + (nowIndex + dates * (reqIndex - 1)))
+              that.setData({
+                current: DATA.length - dates * (reqIndex-1),
+              })
+            }
+            else {
+              // that.setData({
+              //   current: dates - 1,
+              // })
+            }
+            // that.setData({
+            //   current: flushreq ? (DATA.length - dates * reqIndex + 1) : (dates - 1),
+            // })
+          }
+        }
+        console.log('todayIndex:' + todayIndex)
+        // if(!startDate && !endDate && !flushreq) {
+        //   signDays = todayIndex
         // }
-        DATA = DATA.reverse().concat(data.reverse())
         that.setData({
           history: DATA.reverse(),
-          current: flushreq ? DATA.length - dates * reqIndex : dates-1,
-          todayIndex: todayIndex  // 设置为之前已签到的天数
+          // todayIndex: signDays,  // 设置为之前已签到的天数
         })
-        reqIndex += 1
+        
         console.log(DATA)
+        console.log(that.data.history)
         
         // 如果当天已签到
         if (wx.getStorageSync('signed')) {
-          console.log(that.data.todayIndex)
+          console.log(signDays)
           that.setData({
             signtxt: '已签到',
-            tiptxt: '已签到' + todayIndex + '天',
-            signdays: todayIndex
+            tiptxt: '已签到' + signDays + '天',
+            signdays: signDays
           })
         }
       }
@@ -339,14 +395,25 @@ Page({
     ctx.fillRect(0, 0, prop * 690, prop * 920)
     // 二维码
     let qrcode = '../images/qrcode.jpg'
-    ctx.drawImage(qrcode, prop * 180, prop * 546, prop * 100, prop * 100);
-    // 日期板块
-    ctx.setFillStyle('#333333')
-    ctx.setFontSize(prop * 34)
-    ctx.fillText(data.year + '年' + data.month + '月', prop * 140, prop * 152)
-    ctx.fillText('农历' + data.chiMonth + data.chiDay, prop * 130, prop * 210)
-    ctx.setFontSize(prop*200)
-    ctx.fillText(data.day, prop * 115, prop * 420)
+    ctx.drawImage(qrcode, prop * 180, prop * 556, prop * 100, prop * 100);
+    // 有节日时日期板块上移 50rpx
+    if (data.festival) {
+      ctx.setFillStyle('#333333')
+      ctx.setFontSize(prop * 34)
+      ctx.fillText(data.year + '年' + data.month + '月', prop * 140, prop * 102)
+      ctx.fillText('农历' + data.chiMonth + data.chiDay, prop * 130, prop * 160)
+      ctx.setFontSize(prop * 200)
+      ctx.fillText(data.day, prop * 115, prop * 370)
+    }
+    else {
+      // 无节日时日期板块
+      ctx.setFillStyle('#333333')
+      ctx.setFontSize(prop * 34)
+      ctx.fillText(data.year + '年' + data.month + '月', prop * 140, prop * 152)
+      ctx.fillText('农历' + data.chiMonth + data.chiDay, prop * 130, prop * 210)
+      ctx.setFontSize(prop * 200)
+      ctx.fillText(data.day, prop * 115, prop * 420)
+    }
     if (data.festival) {
       // 节日左边线条
       ctx.beginPath()
@@ -358,21 +425,22 @@ Page({
       // 节日
       ctx.setFontSize(prop * 34)
       ctx.setFillStyle('#333333')
-      ctx.fillText(data.festival, prop * 196, prop * 525)
+      ctx.fillText(data.festival, prop * 178, prop * 475)
       // 节日右边线条
       ctx.lineWidth = prop * 2;
       ctx.moveTo(prop * 292, prop * 516)
       ctx.lineTo(prop * 342, prop * 516)
       ctx.setStrokeStyle('#333333')
       ctx.stroke()
-      // 中间线条
-      ctx.beginPath()
-      ctx.lineWidth = prop * 2;
-      ctx.moveTo(prop * 450, prop * 40)
-      ctx.lineTo(prop * 450, prop * 650)
-      ctx.setStrokeStyle('#e0e0e0')
-      ctx.stroke()
+      
     }
+    // 中间线条
+    ctx.beginPath()
+    ctx.lineWidth = prop * 2;
+    ctx.moveTo(prop * 450, prop * 40)
+    ctx.lineTo(prop * 450, prop * 650)
+    ctx.setStrokeStyle('#e0e0e0')
+    ctx.stroke()
     // icon
     let icon = '../images/logo-icon@3x.png'
     ctx.drawImage(icon, prop * 500, prop * 70, prop * 50, prop * 79);
@@ -577,20 +645,20 @@ Page({
   // 显示详情
   display: function(e){
     let currentIndex = e.currentTarget.dataset.index
+    console.log(currentIndex)
     let obj = JSON.stringify(this.data.history[currentIndex])
+    let styleType = wx.getStorageSync('currentStyle') ? wx.getStorageSync('currentStyle') : this.data.currentStyle
     wx.navigateTo({
-      url: '../detail/detail?obj=' + obj + '&style=' + app.globalData.currentStyle
+      url: '../detail/detail?obj=' + obj + '&style=' + styleType + '&current=' + currentIndex
     })
   },
   // 滑动监听
-  changeIndex: function(e){
-    // 当滑动到倒数第二个，再次请求
+  changeIndex: function(e){    
     let enddatekey = this.getDate(reqDate, true)
     let datekey = this.getDate(enddatekey)
 
-    console.log(e.detail.current)
-
-    if(e.detail.current === 0) {
+    // 当滑动到最后一个，再次请求
+    if (nowIndex === 1) {
       this.getDailyInfo(datekey, enddatekey, true)
     }
     this.setData({
@@ -598,7 +666,8 @@ Page({
       // firstSlide: e.detail.current === 0 ? true : false
     })
     this.setData({
-      lastSlide: this.data.isToday ? true : false
+      lastSlide: this.data.isToday ? true : false,
+      current: e.detail.current
     })
   },
   // 回到今天
@@ -630,6 +699,10 @@ Page({
     })
   },
   touchStart:function(e){
+    // console.log(e)
+    nowIndex = e.currentTarget.dataset.index
+    console.log(nowIndex)
+    
     touchDot = e.touches[0].pageX; // 获取触摸时的原点
     // 使用计时器记录时间  
     interval = setInterval(function () {
@@ -642,14 +715,16 @@ Page({
     //只处理第一张和最后一张
     if (e.currentTarget.dataset.index === that.data.history.length - 1 || e.currentTarget.dataset.index === 0){
       let moveX = e.touches[0].pageX;
-      // 第一张左滑
+      // 左滑
       if (moveX - touchDot <= -40 && time < 10) {
+        // 第一张
         if (e.currentTarget.dataset.index === that.data.history.length - 1) {
           that.show('明天，敬请期待~')
         }
       }
-      // 最后一张右滑
+      // 右滑
       if (moveX - touchDot >= 40 && time < 10) {
+        // 最后一张
         if (e.currentTarget.dataset.index === 0) {
           that.show('只能到这里咯！')
         }
@@ -669,7 +744,7 @@ Page({
     return {
       title: '每日一签',
       desc: '最具人气的签到小程序',
-      path: 'pages/index/index',
+      path: 'pages/index/index?current=' + that.data.current,
       imageUrl: 'https://qiniu.image.cq-wnl.com/sentenceimg/2017103024b9b0572e2d47139d0d5798fc1208d3.jpg',
       success: function (res) {
         // 转发成功
