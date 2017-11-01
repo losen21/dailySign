@@ -1,6 +1,8 @@
 // pages/changestyle/changestyle.js
 
 var app = getApp();
+const brand = app.globalData.brand
+
 Page({
 
   /**
@@ -13,7 +15,8 @@ Page({
     duration: '300',
     active0: true,
     active1: false,
-    active2: false
+    active2: false,
+    isHuawei: false
   },
 
   /**
@@ -27,6 +30,14 @@ Page({
       current: index
     });
     console.log(this.data.item)
+  },
+  onShow:function(){
+    // 处理 华为/google 手机
+    if (brand === 'HUAWEI' || brand === 'huawei' || brand === 'google') {
+      this.setData({
+        isHuawei: true
+      })
+    }
   },
   // 手动选择
   selectStyle: function (e) {
@@ -44,7 +55,7 @@ Page({
       //使用上一个页面的方法设置数据
       prePage.changeStyleData(currentStyleIndex)
     }
-    wx.setStorageSync('currentStyle', currentIndex)
+    wx.setStorageSync('currentStyle', currentStyleIndex)
   },
   // 滑动选择
   changeIndex:function(e){

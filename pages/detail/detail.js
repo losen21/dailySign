@@ -99,7 +99,7 @@ Page({
       // 节日
       ctx.setFontSize(prop * 34)
       ctx.setFillStyle('#333333')
-      ctx.fillText(data.festival, prop * 178, prop * 475)
+      ctx.fillText(data.festival, data.festival.length === 3 ? prop * 178 : prop * 194, prop * 475)
       // 节日右边线条
       ctx.lineWidth = prop * 2;
       ctx.moveTo(prop * 292, prop * 466)
@@ -316,7 +316,7 @@ Page({
     return {
       title: '每日一签',
       desc: '最具人气的签到小程序',
-      path: 'pages/index/index?current=' + that.data.current,
+      path: 'pages/index/index',
       // imageUrl: 'https://qiniu.image.cq-wnl.com/sentenceimg/2017103024b9b0572e2d47139d0d5798fc1208d3.jpg',
       success: function (res) {
         // 转发成功

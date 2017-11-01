@@ -1,12 +1,14 @@
 
-// import HistoryData from '../../data.js'
+// import localData from '../../data.js'
 import util from '../../utils/util.js'
-let HistoryData = 0
+let localData = 0
+
 //index.js
 //获取应用实例
 const app = getApp()
 const prop = app.globalData.Proportion
 const system = app.globalData.system
+const brand = app.globalData.brand
 // touch相关
 let touchDot = 0,time = 0,interval = ""
 // 请求次数
@@ -16,12 +18,17 @@ let DATA = []
 // 请求的日期
 let reqDate = ''
 // 请求天数, 实际请求天数 = dates + 1 ,因为getPointDate()方法多算了一天
-let dates = 9
+let dates = 30
 // 分享的天数序号
-let shareIndex
+let shareIndex = 0
 // 之前签到的天数
 let signDays = 0
-
+// 当前序号
+let nowIndex = 0
+// 点击flag 防止连续点击
+let flag = 0
+// 是否启用分享
+let isShare = false
 
 Page({
   data: {
@@ -32,9 +39,11 @@ Page({
     signdays: '',
     // todayIndex: 0,   //当天的已签到天数
     history: {},
+    // swiper相关
     autoplay: false,
-    duration: '300',
+    duration: '400',
     current: dates,
+    //
     showPop: false,
     isToday: true,
     lastSlide: true,
@@ -43,21 +52,29 @@ Page({
     style1: false,
     style2: false,
     currentStyle: 0,
-    showLoading: false
+    showLoading: false,
+    itemClicked: false,
+    isHuawei: false,
+    nowIndex: dates,
+    loading: false
   },
   onLoad: function (options) {
+    // 显示加载
+    this.setData({
+      loading: true
+    })
     console.log(util.getCurrentPageUrlWithArgs())
     // 处理分享过来的日期 分享的天数超过一个月，就显示今天
-    let index = parseInt(options.current)
-    if (index) {
-      if (index < 30 && index >= 0) {
-        shareIndex = index
-      }
-      else {
-        shareIndex = 30
-      }
-    }
-
+    // if (options.current) {
+    //   let index = parseInt(options.current)
+    //   if (index < 30 && index >= 0) {
+    //     shareIndex = index
+    //   }
+    //   else {
+    //     shareIndex = 30
+    //   }
+    // }
+    
     let app = getApp()
     // toast组件实例
     new app.ToastPannel();
@@ -78,10 +95,10 @@ Page({
     if (wx.getStorageSync('currentStyle')) {
       this.changeStyleData(wx.getStorageSync('currentStyle'))
     }
-    // 初始化签到天数
-    if (wx.getStorageSync('signDays')) {
-      signDays = wx.getStorageSync('signDays')
-    }
+    // // 初始化签到天数
+    // if (wx.getStorageSync('signDays')) {
+    //   signDays = wx.getStorageSync('signDays')
+    // }
 
     // 在第二天进行操作时
     let useDate = util.formatTime(new Date()).split(' ')[0];
@@ -98,35 +115,36 @@ Page({
     else {
       wx.setStorageSync('useDate', useDate)
     }
-
-    // 如果有本地数据
-    if (HistoryData) {
-      let data = HistoryData.HistoryData;
-      data[22].rIndex = 24
-      for (let i = 0, len = data.length; i < len; i++ ) {
-        data[i].year = data[i].dateKey.split('-')[0]
-        data[i].month = data[i].dateKey.split('-')[1]
-        data[i].day = data[i].dateKey.split('-')[2]
-        data[i].largeYear = parseInt(data[i].dateKey.split('-')[0]).toLocaleString('zh-Hans-CN-u-nu-hanidec').replace(',', '')
-        data[i].largerIndex = this.NumberToChinese(data[i].rIndex)
-      }
-      console.log(data);
+    DATA = []
+    this.getDailyInfo()
+  },
+  onReady:function(){
+    // console.log('页面渲染完成')
+    this.setData({
+      loading: false
+    })
+  },
+  onShow:function(){
+    reqIndex = 0
+    console.log('页面显示')
+    console.log('isShare=' + isShare)
+    // 初始化签到天数
+    if (wx.getStorageSync('signDays')) {
+      signDays = wx.getStorageSync('signDays')
+    }
+    // 处理华为手机
+    if (brand === 'HUAWEI' || brand === 'huawei' || brand === 'google') {
       this.setData({
-        history: data,
-        current: HistoryData.HistoryData.length - 1
+        isHuawei: true
       })
     }
-    else {
-      // 获取每日信息
-      this.getDailyInfo('','',0)
-      // if (shareIndex) {
-      //   console.log('分享的序号：' + shareIndex)
-      //   that.setData({
-      //     current: shareIndex
-      //   })
-      // }
-    }
-    
+    // // 置空数据
+    // DATA = []
+    // this.getDailyInfo()
+
+    // this.setData({
+    //   current: nowIndex ? nowIndex : DATA.length-1
+    // })
   },
   // 改变样式
   changeStyleData:function(index){
@@ -226,6 +244,9 @@ Page({
   },
   // 获取签到信息
   getDailyInfo: function(startDate,endDate,flushreq){
+    // 记录总共请求次数
+    reqIndex += 1
+    console.log('请求次数：' + reqIndex)
     // let datekey = wx.getStorageSync('firstTime')
 
     let enddatekey = endDate ? endDate : util.formatTime(new Date()).split(' ')[0]
@@ -292,15 +313,32 @@ Page({
         }
         else {
           DATA = DATA.reverse().concat(data.reverse())
-          that.setData({
-            current: flushreq ? dates + 2 : dates
-          })
+          // 如果有分享的索引值
+          if(shareIndex) {
+            console.log('分享的的索引：'+ shareIndex)
+            // 如果不是当天的索引
+            if(shareIndex !== DATA.length - 1) {
+              that.setData({
+                isToday: false
+              })
+            }
+            // 设置为当前分享的索引
+            that.setData({
+              current: shareIndex
+            })
+          }
+          else {
+            that.setData({
+              current: flushreq ? dates + 2 : dates
+            })
+          }
         }
         console.log('todayIndex:' + todayIndex)
 
         that.setData({
           history: DATA.reverse(),
         })
+        // wx.setStorageSync('historyData', DATA)
         console.log(that.data.history)
         
         // 如果当天已签到
@@ -423,7 +461,7 @@ Page({
       // 节日
       ctx.setFontSize(prop * 34)
       ctx.setFillStyle('#333333')
-      ctx.fillText(data.festival, prop * 178, prop * 475)
+      ctx.fillText(data.festival, data.festival.length === 3 ? prop * 178 : prop * 194, prop * 475)
       // 节日右边线条
       ctx.lineWidth = prop * 2;
       ctx.moveTo(prop * 292, prop * 516)
@@ -642,6 +680,7 @@ Page({
   },
   // 显示详情
   display: function(e){
+    this.itemClicked(this)
     let currentIndex = e.currentTarget.dataset.index
     console.log(currentIndex)
     let obj = JSON.stringify(this.data.history[currentIndex])
@@ -650,15 +689,39 @@ Page({
       url: '../detail/detail?obj=' + obj + '&style=' + styleType + '&current=' + currentIndex
     })
   },
+  // 阻止多次点击
+  itemClicked: function(self) {
+    self.setData({
+      itemClicked: true
+    })
+    setTimeout(function () {
+      self.setData({
+        itemClicked: false
+      })
+    }, 500)
+  },
   // 滑动监听
-  changeIndex: function(e){    
+  changeIndex: function(e){
+    let that = this
+    console.log(e.detail.current)
     let enddatekey = this.getPointDate(reqDate, -dates - 1)
     let datekey = this.getPointDate(enddatekey, -dates)
 
     console.log('当前swiper索引值：'+e.detail.current)
-    // 当滑动到最后一个，再次请求
+    this.setData({
+      nowIndex: e.detail.current
+    })
+    // 当滑动到倒数第二个，再次请求
     if (e.detail.current === 1) {
       this.getDailyInfo(datekey, enddatekey, 1)
+      // this.setData({
+      //   loading: true
+      // })
+      // setTimeout(function(){
+      //   that.setData({
+      //     loading: false
+      //   })
+      // },1000)
     }
     this.setData({
       isToday: (e.detail.current === this.data.history.length - 1) ? true : false,      
@@ -666,7 +729,7 @@ Page({
     })
     this.setData({
       lastSlide: this.data.isToday ? true : false,
-      current: e.detail.current
+      // current: e.detail.current
     })
   },
   // 回到今天
@@ -737,10 +800,13 @@ Page({
       // 来自页面内转发按钮
       console.log(res.target)
     }
+    // 保存当前序号
+    isShare = true
+    nowIndex = that.data.current
     return {
       title: '每日一签',
       desc: '最具人气的签到小程序',
-      path: 'pages/index/index?current=' + that.data.current,
+      path: 'pages/index/index?current='+ that.data.current,
       // imageUrl: 'https://qiniu.image.cq-wnl.com/sentenceimg/2017103024b9b0572e2d47139d0d5798fc1208d3.jpg',
       success: function (res) {
         // 转发成功

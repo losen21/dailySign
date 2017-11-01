@@ -1,6 +1,6 @@
 <!--pages/changestyle/changestyle.wxml-->
 
-<view class='main'>
+<view class="{{!isHuawei ? 'main' : 'main huawei'}}">
   <swiper autoplay="{{autoplay}}" duration="{{duration}}" bindchange="changeIndex" current='{{current}}'>
     <swiper-item bindtap='' data-index='{{index}}' bindtouchmove=''>
       <view class='daily-sign style1'>
