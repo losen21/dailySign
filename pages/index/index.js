@@ -46,12 +46,12 @@ Page({
     //
     showPop: false,
     isToday: true,
-    lastSlide: true,
-    firstSlide: false,
+    // 切换样式相关
     style0: true,
     style1: false,
     style2: false,
     currentStyle: 0,
+    // 
     showLoading: false,
     itemClicked: false,
     isHuawei: false,
@@ -713,23 +713,10 @@ Page({
     })
     // 当滑动到倒数第二个，再次请求
     if (e.detail.current === 1) {
-      this.getDailyInfo(datekey, enddatekey, 1)
-      // this.setData({
-      //   loading: true
-      // })
-      // setTimeout(function(){
-      //   that.setData({
-      //     loading: false
-      //   })
-      // },1000)
+      // this.getDailyInfo(datekey, enddatekey, 1)
     }
     this.setData({
       isToday: (e.detail.current === this.data.history.length - 1) ? true : false,      
-      // firstSlide: e.detail.current === 0 ? true : false
-    })
-    this.setData({
-      lastSlide: this.data.isToday ? true : false,
-      // current: e.detail.current
     })
   },
   // 回到今天
