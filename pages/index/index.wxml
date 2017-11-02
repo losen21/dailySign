@@ -2,7 +2,7 @@
 <import src='../toast/toast.wxml'/>
 <template is="toast" data="{{ ..._toast_ }}"/>
 
-<view class="{{!isHuawei ? 'main index' : 'main index huawei'}}">
+<view class="{{!isHuawei ? 'main index' : 'main index huawei'}}" wx:if="{{!loading}}">
   <view class="{{nowIndex === 0 ? 'left-icon slide-icon hidden' :'left-icon slide-icon show'}}" catchtap='prev' data-current="{{nowIndex}}"></view>
   <view class="{{nowIndex === history.length-1 ? 'right-icon slide-icon hidden' :'right-icon slide-icon show'}}" catchtap='next' data-current="{{nowIndex}}"></view>
   <swiper autoplay="{{autoplay}}" duration="{{duration}}" bindchange="changeIndex" current='{{current}}' interval='{{interval}}'>
@@ -160,7 +160,7 @@
       <view class='close-icon'></view>
     </view>
   </view>
-  <!-- <button bindtap='saveSign' style='position:absolute;top:980rpx;left:50rpx;height:90rpx;'>Creat Canvas</button>    -->
+   <!-- <button bindtap='saveSign' style='position:absolute;top:980rpx;left:50rpx;height:90rpx;'>Creat Canvas</button>     -->
 </view>
 
 <view class='canvas-group'>

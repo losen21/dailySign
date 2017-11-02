@@ -40,7 +40,7 @@ Page({
       this.drawStyle0()
       setTimeout(function () {
         that.saveImage('style0')
-      }, 1500)
+      }, 2500)
     }
     if (this.data.style1) {
       canvasId = 'style1'
@@ -48,7 +48,7 @@ Page({
       // 防止图片还未绘制完成就保存 ps 官方drawImage方法还未加入绘制完成回调，用延时处理
       setTimeout(function () {
         that.saveImage('style1')
-      }, 1500)
+      }, 2500)
     }
     if (this.data.style2) {
       canvasId = 'style2'
@@ -316,7 +316,7 @@ Page({
     return {
       title: '每日一签',
       desc: '最具人气的签到小程序',
-      path: 'pages/index/index',
+      path: 'pages/index/index?current=' + that.data.current,
       // imageUrl: 'https://qiniu.image.cq-wnl.com/sentenceimg/2017103024b9b0572e2d47139d0d5798fc1208d3.jpg',
       success: function (res) {
         // 转发成功

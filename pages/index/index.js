@@ -27,8 +27,10 @@ let signDays = 0
 let nowIndex = 0
 // 点击flag 防止连续点击
 let flag = 0
-// 是否启用分享
-let isShare = false
+// 设置连续请求的月份数
+let reqMonth = 3
+// 最终连续请求数据
+let FINALL_DATA
 
 Page({
   data: {
@@ -65,15 +67,9 @@ Page({
     })
     console.log(util.getCurrentPageUrlWithArgs())
     // 处理分享过来的日期 分享的天数超过一个月，就显示今天
-    // if (options.current) {
-    //   let index = parseInt(options.current)
-    //   if (index < 30 && index >= 0) {
-    //     shareIndex = index
-    //   }
-    //   else {
-    //     shareIndex = 30
-    //   }
-    // }
+    if (options.current) {
+      shareIndex = parseInt(options.current)
+    }
     
     let app = getApp()
     // toast组件实例
@@ -95,10 +91,15 @@ Page({
     if (wx.getStorageSync('currentStyle')) {
       this.changeStyleData(wx.getStorageSync('currentStyle'))
     }
-    // // 初始化签到天数
-    // if (wx.getStorageSync('signDays')) {
-    //   signDays = wx.getStorageSync('signDays')
-    // }
+
+    // 初始化签到天数
+    if (wx.getStorageSync('signDays')) {
+      signDays = wx.getStorageSync('signDays')
+      that.setData({
+        signtxt: '已签到',
+        tiptxt: '已签到' + signDays + '天',
+      })
+    }
 
     // 在第二天进行操作时
     let useDate = util.formatTime(new Date()).split(' ')[0];
@@ -115,23 +116,21 @@ Page({
     else {
       wx.setStorageSync('useDate', useDate)
     }
-    DATA = []
-    this.getDailyInfo()
+    // DATA = []
+    // this.getDailyInfo()
+
+    // 连续请求数据
+    reqDate = ''
+    this.sendAjaxS(reqMonth)
   },
   onReady:function(){
     // console.log('页面渲染完成')
-    this.setData({
-      loading: false
-    })
+    
   },
   onShow:function(){
     reqIndex = 0
     console.log('页面显示')
-    console.log('isShare=' + isShare)
-    // 初始化签到天数
-    if (wx.getStorageSync('signDays')) {
-      signDays = wx.getStorageSync('signDays')
-    }
+    
     // 处理华为手机
     if (brand === 'HUAWEI' || brand === 'huawei' || brand === 'google') {
       this.setData({
@@ -145,6 +144,97 @@ Page({
     // this.setData({
     //   current: nowIndex ? nowIndex : DATA.length-1
     // })
+  },
+    
+  sendAjaxS: function(month){
+    console.log('发送请求')
+    
+    let that = this   
+    
+    let index= 0;      
+    let result= [];  
+    sendAjax();  
+    function sendAjax() {
+      if (index >= month) {
+        that.formatData(result);
+        return;
+      }
+      let enddatekey = reqDate ? that.getPointDate(reqDate, -dates-1) : util.formatTime(new Date()).split(' ')[0]
+      let datekey = that.getPointDate(enddatekey, -dates)
+      reqDate = enddatekey
+      // 获取该用户签到情况
+      wx.request({
+        url: 'https://service.51wnl.com/Api/SignEvDay/GetSignInfo',
+        data: {
+          uid: that.uid,
+          did: '',
+          datekey: datekey,
+          enddatekey: enddatekey
+        },
+        dataType: 'json',
+        header: {
+          'content-type': 'application/json' // 默认值
+        },
+        success: function (res) {
+            let data = res.data.data.reverse()
+            for (let i = 0, len = data.length; i < len; i++) {
+              result.push(data[i]);
+            }
+            index++;
+            sendAjax();   
+        },
+        error: function () {
+          console.log("请求错误")
+        }
+      })
+    }  
+  },
+  formatData: function (data, signFlag){
+    // console.log('连续请求结果：' + data)
+    // FINALL_DATA = JSON.stringify(data)
+    let that = this
+    let todayIndex = 0
+    for (let i = 0, len = data.length; i < len; i++) {
+      data[i].year = data[i].dateKey.split('-')[0]
+      data[i].month = data[i].dateKey.split('-')[1]
+      data[i].day = data[i].dateKey.split('-')[2]
+      data[i].largeYear = that.yearToChinese(parseInt(data[i].dateKey.split('-')[0]))
+      data[i].largerIndex = that.NumberToChinese(data[i].rIndex)
+      data[i].largeMonth = that.NumberToChinese(data[i].dateKey.split('-')[1])
+      data[i].largeDay = that.NumberToChinese(data[i].dateKey.split('-')[2])
+      if (data[i].largeMonth === '一十') {
+        data[i].largeMonth = '十'
+      }
+      if (data[i].largeDay === '一十') {
+        data[i].largeDay = '十'
+      }
+      if (data[i].festival) {
+        // data[i].festival = data[i].festival.substring(0,2)
+        data[i].festival = data[i].festival.replace('节', '')
+      }
+      if (data[i].rIndex !== 0) {
+        todayIndex = data[i].rIndex
+      }
+    }
+
+    // if (startDate === endDate && startDate) {
+    //   DATA = DATA.reverse()
+    //   DATA[0] = data[0]
+    //   signDays = todayIndex  // 设置为之前已签到的天数
+    //   wx.setStorageSync('signDays', signDays)
+    // }
+    console.log('已签到天数:' + todayIndex)
+    FINALL_DATA = data.reverse()
+    console.log(FINALL_DATA)
+    console.log('分享的的索引：' + shareIndex)
+
+    this.setData({
+      history: FINALL_DATA,
+      current: shareIndex ? shareIndex : data.length - 1,
+      nowIndex: data.length - 1,
+      isToday: (shareIndex !== FINALL_DATA.length - 1) && shareIndex ? false : true, // 如果分享的不是当天的索引
+      loading: false
+    })
   },
   // 改变样式
   changeStyleData:function(index){
@@ -177,24 +267,65 @@ Page({
           if (res.data.status === 200) {
             let date = util.formatTime(new Date()).split(' ')[0]
             // 签到成功后重新请求当天数据，并替换之前的数据
-            that.getDailyInfo(date,date,0)
-            // let userData = that.data.history
-            // console.log('userData:' + userData[0].year)
-            // let rindex = userData[userData.length - 1].rIndex
-            // userData[userData.length - 1].largerIndex = that.NumberToChinese(rindex)
-
-            that.setData({
-              signtxt: '已签到',
-              tiptxt: '已签到' + signDays + '天',
-              signdays: signDays,
-              showPop: true,
-              // history: userData
-            })
-            wx.setStorageSync('signed', true)
+            that.getToadyInfo()       
           }
         }
       })
     }
+  },
+  // 获取签到当天的信息
+  getToadyInfo:function(){
+    let that = this
+    let today = util.formatTime(new Date()).split(' ')[0]
+    let enddatekey = today
+    let datekey = today
+    // 获取该用户签到情况
+    wx.request({
+      url: 'https://service.51wnl.com/Api/SignEvDay/GetSignInfo',
+      data: {
+        uid: that.uid,
+        did: '',
+        datekey: datekey,
+        enddatekey: enddatekey
+      },
+      dataType: 'json',
+      header: {
+        'content-type': 'application/json' // 默认值
+      },
+      success: function (res) {
+        let data = res.data.data[0]
+        data.year = data.dateKey.split('-')[0]
+        data.month = data.dateKey.split('-')[1]
+        data.day = data.dateKey.split('-')[2]
+        data.largeYear = that.yearToChinese(parseInt(data.dateKey.split('-')[0]))
+        data.largerIndex = that.NumberToChinese(data.rIndex)
+        data.largeMonth = that.NumberToChinese(data.dateKey.split('-')[1])
+        data.largeDay = that.NumberToChinese(data.dateKey.split('-')[2])
+        if (data.largeMonth === '一十') {
+          data.largeMonth = '十'
+        }
+        if (data.largeDay === '一十') {
+          data.largeDay = '十'
+        }
+        if (data.festival) {
+          // data.festival = data.festival.substring(0,2)
+          data.festival = data.festival.replace('节', '')
+        }
+        if (data.rIndex !== 0) {
+          signDays = data.rIndex
+          wx.setStorageSync('signDays', data.rIndex)
+        }
+        FINALL_DATA[FINALL_DATA.length - 1] = data
+        that.setData({
+          signtxt: '已签到',
+          tiptxt: '已签到' + signDays + '天',
+          signdays: signDays,
+          showPop: true,
+          history: FINALL_DATA
+        })
+        wx.setStorageSync('signed', true)
+      }
+    })
   },
   // 生成唯一用户标识uid
   uuid: function() {
@@ -243,116 +374,106 @@ Page({
     return result
   },
   // 获取签到信息
-  getDailyInfo: function(startDate,endDate,flushreq){
-    // 记录总共请求次数
-    reqIndex += 1
-    console.log('请求次数：' + reqIndex)
-    // let datekey = wx.getStorageSync('firstTime')
-
-    let enddatekey = endDate ? endDate : util.formatTime(new Date()).split(' ')[0]
-    let datekey = startDate ? startDate : this.getPointDate(enddatekey, -dates)
-    // 记录每次请求的结束日期
-    reqDate = enddatekey
-
-    console.log('enddatekey:' + enddatekey + '   ' + 'datekey' + datekey)
-    // 计算首次使用日期和当前日期差值，最多显示一个月的数据
-    // let diff = this.getDateDiff(datekey, enddatekey)
-    // console.log('使用时间相差天数' + diff)
-    console.log('30天前的日期:' + this.getPointDate(enddatekey, -dates))
-
-    // datekey = diff > 31 ? this.getDate(enddatekey) : datekey
+  // getDailyInfo: function(startDate,endDate,flushreq){
+  //   // 记录总共请求次数
+  //   reqIndex += 1
+  //   console.log('请求次数：' + reqIndex)
+  //   let enddatekey = endDate ? endDate : util.formatTime(new Date()).split(' ')[0]
+  //   let datekey = startDate ? startDate : this.getPointDate(enddatekey, -dates)
+  //   // 记录每次请求的结束日期
+  //   reqDate = enddatekey
     
-    let that = this
-    // 获取该用户签到情况
-    wx.request({
-      url: 'https://service.51wnl.com/Api/SignEvDay/GetSignInfo',
-      data: {
-        uid: that.uid,
-        did: '',
-        datekey: datekey,
-        enddatekey: enddatekey
-      },
-      dataType: 'json',
-      header: {
-        'content-type': 'application/json' // 默认值
-      },
-      success: function (res) {
-        let data = res.data.data
-        let todayIndex = 0
-        for (let i = 0, len = data.length; i < len; i++) {
-          data[i].year = data[i].dateKey.split('-')[0]
-          data[i].month = data[i].dateKey.split('-')[1]
-          data[i].day = data[i].dateKey.split('-')[2]
-          // data[i].largeYear = parseInt(data[i].dateKey.split('-')[0]).toLocaleString('zh-Hans-CN-u-nu-hanidec').replace(',', '')
-          data[i].largeYear = that.yearToChinese(parseInt(data[i].dateKey.split('-')[0]))
-          data[i].largerIndex = that.NumberToChinese(data[i].rIndex)
-          data[i].largeMonth = that.NumberToChinese(data[i].dateKey.split('-')[1])
-          data[i].largeDay = that.NumberToChinese(data[i].dateKey.split('-')[2])
-          if (data[i].largeMonth === '一十') {
-            data[i].largeMonth = '十'
-          }
-          if (data[i].largeDay === '一十') {
-            data[i].largeDay = '十'
-          }
-          if (data[i].festival) {
-            // data[i].festival = data[i].festival.substring(0,2)
-            data[i].festival = data[i].festival.replace('节', '')
-          }
+  //   let that = this
+  //   // 获取该用户签到情况
+  //   wx.request({
+  //     url: 'https://service.51wnl.com/Api/SignEvDay/GetSignInfo',
+  //     data: {
+  //       uid: that.uid,
+  //       did: '',
+  //       datekey: datekey,
+  //       enddatekey: enddatekey
+  //     },
+  //     dataType: 'json',
+  //     header: {
+  //       'content-type': 'application/json' // 默认值
+  //     },
+  //     success: function (res) {
+  //       let data = res.data.data
+  //       let todayIndex = 0
+  //       for (let i = 0, len = data.length; i < len; i++) {
+  //         data[i].year = data[i].dateKey.split('-')[0]
+  //         data[i].month = data[i].dateKey.split('-')[1]
+  //         data[i].day = data[i].dateKey.split('-')[2]
+  //         // data[i].largeYear = parseInt(data[i].dateKey.split('-')[0]).toLocaleString('zh-Hans-CN-u-nu-hanidec').replace(',', '')
+  //         data[i].largeYear = that.yearToChinese(parseInt(data[i].dateKey.split('-')[0]))
+  //         data[i].largerIndex = that.NumberToChinese(data[i].rIndex)
+  //         data[i].largeMonth = that.NumberToChinese(data[i].dateKey.split('-')[1])
+  //         data[i].largeDay = that.NumberToChinese(data[i].dateKey.split('-')[2])
+  //         if (data[i].largeMonth === '一十') {
+  //           data[i].largeMonth = '十'
+  //         }
+  //         if (data[i].largeDay === '一十') {
+  //           data[i].largeDay = '十'
+  //         }
+  //         if (data[i].festival) {
+  //           // data[i].festival = data[i].festival.substring(0,2)
+  //           data[i].festival = data[i].festival.replace('节', '')
+  //         }
 
-          if(data[i].rIndex !== 0) {
-            todayIndex = data[i].rIndex
-          }
-        }
+  //         if(data[i].rIndex !== 0) {
+  //           todayIndex = data[i].rIndex
+  //         }
+  //       }
        
-        // 只请求签到当天,替换当天的数据
-        if(startDate === endDate && startDate) {
-          DATA = DATA.reverse()
-          DATA[0] = data[0]
-          signDays = todayIndex  // 设置为之前已签到的天数
-          wx.setStorageSync('signDays', signDays)
-        }
-        else {
-          DATA = DATA.reverse().concat(data.reverse())
-          // 如果有分享的索引值
-          if(shareIndex) {
-            console.log('分享的的索引：'+ shareIndex)
-            // 如果不是当天的索引
-            if(shareIndex !== DATA.length - 1) {
-              that.setData({
-                isToday: false
-              })
-            }
-            // 设置为当前分享的索引
-            that.setData({
-              current: shareIndex
-            })
-          }
-          else {
-            that.setData({
-              current: flushreq ? dates + 2 : dates
-            })
-          }
-        }
-        console.log('todayIndex:' + todayIndex)
+  //       // 只请求签到当天,替换当天的数据
+  //       if(startDate === endDate && startDate) {
+  //         DATA = DATA.reverse()
+  //         DATA[0] = data[0]
+  //         signDays = todayIndex  // 设置为之前已签到的天数
+  //         wx.setStorageSync('signDays', signDays)
+  //       }
+  //       else {
+  //         DATA = DATA.reverse().concat(data.reverse())
+  //         // 如果有分享的索引值
+  //         if(shareIndex) {
+  //           console.log('分享的的索引：'+ shareIndex)
+  //           // 如果不是当天的索引
+  //           if(shareIndex !== DATA.length - 1) {
+  //             that.setData({
+  //               isToday: false
+  //             })
+  //           }
+  //           // 设置为当前分享的索引
+  //           that.setData({
+  //             current: shareIndex
+  //           })
+  //         }
+  //         else {
+  //           that.setData({
+  //             current: flushreq ? dates + 2 : dates
+  //           })
+  //         }
+  //       }
+  //       console.log('todayIndex:' + todayIndex)
 
-        that.setData({
-          history: DATA.reverse(),
-        })
-        // wx.setStorageSync('historyData', DATA)
-        console.log(that.data.history)
+  //       that.setData({
+  //         history: DATA.reverse(),
+  //       })
+  //       // wx.setStorageSync('historyData', DATA)
+  //       console.log(that.data.history)
         
-        // 如果当天已签到
-        if (wx.getStorageSync('signed')) {
-          console.log(signDays)
-          that.setData({
-            signtxt: '已签到',
-            tiptxt: '已签到' + signDays + '天',
-            signdays: signDays
-          })
-        }
-      }
-    })
-  },
+  //       // 如果当天已签到
+  //       if (wx.getStorageSync('signed')) {
+  //         console.log(signDays)
+  //         that.setData({
+  //           signtxt: '已签到',
+  //           tiptxt: '已签到' + signDays + '天',
+  //           signdays: signDays
+  //         })
+  //       }
+  //     }
+  //   })
+  // },
   // 计算日期相差天数
   getDateDiff: function (startDate, endDate){
     let startTime = new Date(Date.parse(startDate.replace(/-/g, "/"))).getTime();
@@ -788,12 +909,11 @@ Page({
       console.log(res.target)
     }
     // 保存当前序号
-    isShare = true
-    nowIndex = that.data.current
+    console.log('当前序号：' + that.data.nowIndex)
     return {
       title: '每日一签',
       desc: '最具人气的签到小程序',
-      path: 'pages/index/index?current='+ that.data.current,
+      path: 'pages/index/index?current=' + that.data.nowIndex,
       // imageUrl: 'https://qiniu.image.cq-wnl.com/sentenceimg/2017103024b9b0572e2d47139d0d5798fc1208d3.jpg',
       success: function (res) {
         // 转发成功

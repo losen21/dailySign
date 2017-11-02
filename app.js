@@ -1,5 +1,7 @@
 //app.js
-
+// 导入阿拉丁sdk
+var aldstat = require("./utils/ald-stat.js");
+// 引入toast
 import { ToastPannel } from './pages/toast/toast.js'
 
 App({

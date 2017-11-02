@@ -22,14 +22,14 @@ page {
   width:100%;
   height:100%;
   background-color: #efeff4;
-  overflow-y: hidden;
+  overflow-y: hidden; 
   position: fixed;
   top: 0;
-  left: 0; 
+  left: 0;  
 }
 /*canvas开始  */
 .canvas-group {
-  margin:32rpx 30rpx;
+  margin:9999rpx 30rpx;
 }
 .canvas-group canvas {
   margin-bottom: 25rpx;
