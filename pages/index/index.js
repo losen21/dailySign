@@ -89,7 +89,14 @@ Page({
     }
     // 初始化已选样式
     if (wx.getStorageSync('currentStyle')) {
-      this.changeStyleData(wx.getStorageSync('currentStyle'))
+      // this.changeStyleData(wx.getStorageSync('currentStyle'))
+      let index = wx.getStorageSync('currentStyle')
+      this.setData({
+        style0: index === 0 ? true : false,
+        style1: index === 1 ? true : false,
+        style2: index === 2 ? true : false,
+        currentStyle: index
+      })
       console.log('当前样式' + wx.getStorageSync('currentStyle'))
     }
 
@@ -238,15 +245,15 @@ Page({
       loading: false
     })
   },
-  // 改变样式
-  changeStyleData:function(index){
-    this.setData({
-      style0: index === 0 ? true : false,
-      style1: index === 1 ? true : false,
-      style2: index === 2 ? true : false,
-      currentStyle: index
-    })
-  },
+  // // 改变样式
+  // changeStyleData:function(index){
+  //   this.setData({
+  //     style0: index === 0 ? true : false,
+  //     style1: index === 1 ? true : false,
+  //     style2: index === 2 ? true : false,
+  //     currentStyle: index
+  //   })
+  // },
   // 用户签到
   signOn: function (e) {
     let that = this
