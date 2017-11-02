@@ -28,7 +28,7 @@ let nowIndex = 0
 // 点击flag 防止连续点击
 let flag = 0
 // 设置连续请求的月份数
-let reqMonth = 3
+let reqMonth = 1
 // 最终连续请求数据
 let FINALL_DATA
 
@@ -90,6 +90,7 @@ Page({
     // 初始化已选样式
     if (wx.getStorageSync('currentStyle')) {
       this.changeStyleData(wx.getStorageSync('currentStyle'))
+      console.log('当前样式' + wx.getStorageSync('currentStyle'))
     }
 
     // 初始化签到天数
@@ -189,9 +190,10 @@ Page({
       })
     }  
   },
-  formatData: function (data, signFlag){
+  formatData: function (data){
     // console.log('连续请求结果：' + data)
     // FINALL_DATA = JSON.stringify(data)
+    // FINALL_DATA = []
     let that = this
     let todayIndex = 0
     for (let i = 0, len = data.length; i < len; i++) {

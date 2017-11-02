@@ -52,8 +52,14 @@ Page({
     if (pages.length > 1) {
       //上一个页面实例对象
       let prePage = pages[pages.length - 2];
-      //使用上一个页面的方法设置数据
-      prePage.changeStyleData(currentStyleIndex)
+      //使用上一个页面的方法设置数据  (经测试，在ios设备上使用上个页面的方法会导致页面卡顿，所以直接设置)
+      // prePage.changeStyleData(currentStyleIndex)
+      prePage.setData({
+        style0: currentStyleIndex === 0 ? true : false,
+        style1: currentStyleIndex === 1 ? true : false,
+        style2: currentStyleIndex === 2 ? true : false,
+        currentStyle: currentStyleIndex
+      })
     }
     wx.setStorageSync('currentStyle', currentStyleIndex)
   },
@@ -70,7 +76,13 @@ Page({
       //上一个页面实例对象
       let prePage = pages[pages.length - 2];
       //关键在这里
-      prePage.changeStyleData(currentIndex)
+      // prePage.changeStyleData(currentIndex)
+      prePage.setData({
+        style0: currentIndex === 0 ? true : false,
+        style1: currentIndex === 1 ? true : false,
+        style2: currentIndex === 2 ? true : false,
+        currentStyle: currentIndex
+      })
     }
     wx.setStorageSync('currentStyle', currentIndex)
   },

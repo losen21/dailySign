@@ -5,7 +5,7 @@
 <view class="{{!isHuawei ? 'main index' : 'main index huawei'}}" wx:if="{{!loading}}">
   <view class="{{nowIndex === 0 ? 'left-icon slide-icon hidden' :'left-icon slide-icon show'}}" catchtap='prev' data-current="{{nowIndex}}"></view>
   <view class="{{nowIndex === history.length-1 ? 'right-icon slide-icon hidden' :'right-icon slide-icon show'}}" catchtap='next' data-current="{{nowIndex}}"></view>
-  <swiper autoplay="{{autoplay}}" duration="{{duration}}" bindchange="changeIndex" current='{{current}}' interval='{{interval}}'>
+  <swiper autoplay="{{autoplay}}" duration="{{duration}}" bindchange="changeIndex" current='{{current}}'>
       <block wx:for="{{history}}" wx:for-index="index" wx:key='index'>
         <swiper-item bindtap="{{!itemClicked ? 'display' : ''}}" data-index='{{index}}' bindtouchstart="touchStart" bindtouchmove="touchMove" bindtouchend="touchEnd"> 
             <view class='daily-sign style1' wx:if='{{style0}}'>
